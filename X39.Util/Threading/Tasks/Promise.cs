@@ -1,5 +1,6 @@
 ﻿namespace X39.Util.Threading.Tasks;
 
+[PublicAPI]
 public class Promise
 {
     internal Exception? Exception;
@@ -30,15 +31,17 @@ public class Promise
 
     public void Complete()
     {
-        if (State != EPromiseState.Primed)
+        if (IsComplete)
             throw new InvalidOperationException("Already completed.");
         State = EPromiseState.Completed;
         Continue();
     }
 
+    public bool IsComplete => State != EPromiseState.Primed;
+
     public void Complete(Exception exception)
     {
-        if (State != EPromiseState.Primed)
+        if (IsComplete)
             throw new InvalidOperationException("Already completed.");
         Exception = exception;
         State = EPromiseState.Failed;
