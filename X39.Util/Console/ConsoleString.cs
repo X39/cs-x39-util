@@ -1,5 +1,4 @@
 ﻿namespace X39.Util.Console;
-
 [PublicAPI]
 
 public readonly record struct ConsoleString
