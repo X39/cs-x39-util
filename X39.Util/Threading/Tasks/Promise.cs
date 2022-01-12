@@ -29,6 +29,38 @@ public class Promise
         }
     }
 
+    private async Task ContinueAsync()
+    {
+        var exceptions = new List<Exception>();
+        var tasks = Callbacks.Select(callback => Task.Run(() =>
+        {
+            try
+            {
+                callback();
+            }
+            catch (Exception e)
+            {
+                lock (exceptions) exceptions.Add(e);
+            }
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
+        if (exceptions.Any())
+        {
+            throw new AggregateException(exceptions);
+        }
+    }
+
+    public bool IsComplete => State != EPromiseState.Primed;
+
+    public Task CompleteAsync()
+    {
+        if (IsComplete)
+            throw new InvalidOperationException("Already completed.");
+        State = EPromiseState.Completed;
+        return ContinueAsync();
+    }
+
     public void Complete()
     {
         if (IsComplete)
@@ -37,14 +69,39 @@ public class Promise
         Continue();
     }
 
-    public bool IsComplete => State != EPromiseState.Primed;
-
-    public void Complete(Exception exception)
+    public AggregateException? Complete(Exception exception)
     {
         if (IsComplete)
             throw new InvalidOperationException("Already completed.");
         Exception = exception;
         State = EPromiseState.Failed;
-        Continue();
+        try
+        {
+            Continue();
+        }
+        catch (AggregateException ex)
+        {
+            return ex;
+        }
+
+        return null;
+    }
+
+    public async Task<AggregateException?> CompleteAsync(Exception exception)
+    {
+        if (IsComplete)
+            throw new InvalidOperationException("Already completed.");
+        Exception = exception;
+        State = EPromiseState.Failed;
+        try
+        {
+            await ContinueAsync();
+        }
+        catch (AggregateException ex)
+        {
+            return ex;
+        }
+
+        return null;
     }
 }
