@@ -2,6 +2,7 @@
 
 namespace X39.Util.Console;
 
+[PublicAPI]
 public static partial class AskConsole
 {
     /// <summary>
@@ -32,14 +33,14 @@ public static partial class AskConsole
     /// confirmed using <see cref="TypeConverter.IsValid(object?)"/>.
     /// </returns>
     /// <exception cref="NotSupportedException">Thrown when no <see cref="TypeConverter"/> is found.</exception>
-    public static T? ForValueOfType<T>(
+    public static T? ForValue<T>(
         ConsoleString askText,
         bool writeAskTextLine = true,
         ConsoleString invalidFormatText = default,
         CancellationToken cancellationToken = default)
     {
         var converter = TypeDescriptor.GetConverter(typeof(T))
-            ?? throw new NotSupportedException("No type converter found.");
+                        ?? throw new NotSupportedException("No type converter found.");
         do
         {
             if (writeAskTextLine)
@@ -56,5 +57,56 @@ public static partial class AskConsole
         } while (!cancellationToken.IsCancellationRequested);
 
         return default;
+    }
+
+    /// <summary>
+    /// Prompts the console user to choose a value from a list of items in <see cref="source"/>.
+    /// </summary>
+    /// <param name="cancellationToken">
+    /// A <see cref="CancellationToken"/> that can be cancelled to abort the loop.
+    /// Will <b>NOT</b> cancel the blocking operation of reading from the console!
+    /// </param>
+    /// <param name="tToString">Function to transform <typeparamref name="T"/> to string.</param>
+    /// <param name="invalidSelectionText">
+    /// The text to display when the selection is out of range or not a number.
+    /// </param>
+    /// <param name="source"></param>
+    /// <typeparam name="T">The type of the <paramref name="source"/>.</typeparam>
+    /// <returns>
+    /// The value returned by <see cref="TypeConverter"/> when given the input string
+    /// after the input string not being empty and the input string being validly convertible,
+    /// confirmed using <see cref="TypeConverter.IsValid(object?)"/>.
+    /// </returns>
+    /// <exception cref="NotSupportedException">Thrown when no <see cref="TypeConverter"/> is found.</exception>
+    public static T ForValueFromCollection<T>(
+        IEnumerable<T> source,
+        Func<T, ConsoleString>? tToString = default,
+        ConsoleString invalidSelectionText = default,
+        CancellationToken cancellationToken = default)
+    {
+        var sourceArray = source as T[] ?? source.ToArray();
+        if (sourceArray.Length is 0)
+            throw new ArgumentException("Empty collection passed.", nameof(source));
+        tToString ??= (t) => t?.ToString() ?? string.Empty;
+        var maxIndexCharacters = sourceArray.Length.ToString().Length;
+        for (var i = 0; i < sourceArray.Length; i++)
+        {
+            var display = tToString(sourceArray[i]);
+            display.Prepend(string.Format($"{{0,{maxIndexCharacters}}}: ", i)).WriteLine();
+        }
+
+        System.Console.Write('>');
+        int index;
+        do
+        {
+            index = ForValue<int>(">", writeAskTextLine: false, cancellationToken: cancellationToken);
+            if (index >= 0 && index < sourceArray.Length)
+                break;
+            if (!invalidSelectionText.Text.IsNullOrWhiteSpace())
+                invalidSelectionText.WriteLine();
+            cancellationToken.ThrowIfCancellationRequested();
+        } while (true);
+
+        return sourceArray[index];
     }
 }

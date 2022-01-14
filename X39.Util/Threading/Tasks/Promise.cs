@@ -104,4 +104,22 @@ public class Promise
 
         return null;
     }
+
+    public async Task<AggregateException?> CompleteAsync(Exception exception)
+    {
+        if (IsComplete)
+            throw new InvalidOperationException("Already completed.");
+        Exception = exception;
+        State = EPromiseState.Failed;
+        try
+        {
+            await ContinueAsync();
+        }
+        catch (AggregateException ex)
+        {
+            return ex;
+        }
+
+        return null;
+    }
 }

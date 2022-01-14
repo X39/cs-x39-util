@@ -17,6 +17,10 @@
         typeof(decimal)
     };
 #>
+// ReSharper disable BuiltInTypeReferenceStyle
+// ReSharper disable RedundantNameQualifier
+using System.ComponentModel;
+
 namespace X39.Util.Console;
 
 public static partial class AskConsole
@@ -26,7 +30,7 @@ public static partial class AskConsole
     {
 #>
     /// <summary>
-    /// Prompts the console user to enter a value of the type <typeparamref name="T"/>.
+    /// Prompts the console user to enter a value of the type <see name="<#= type.FullName #>"/>.
     /// </summary>
     /// <param name="askText">
     /// The text to display when asking.
@@ -42,19 +46,22 @@ public static partial class AskConsole
     /// A <see cref="CancellationToken"/> that can be cancelled to abort the loop.
     /// Will <b>NOT</b> cancel the blocking operation of reading from the console!
     /// </param>
-    /// <typeparam name="T">
-    /// The type to prompt for.
-    /// Type must have a valid <see cref="TypeConverter"/> available that is receivable
-    /// using <see cref="TypeDescriptor.GetConverter(Type)"/>.
-    /// </typeparam>
     /// <returns>
     /// The value returned by <see cref="TypeConverter"/> when given the input string
     /// after the input string not being empty and the input string being validly convertible,
     /// confirmed using <see cref="TypeConverter.IsValid(object?)"/>.
     /// </returns>
     /// <exception cref="NotSupportedException">Thrown when no <see cref="TypeConverter"/> is found.</exception>
-    public static T? For<#= type.Name #>(ConsoleString askText)
-        => AskConsole.ForValue<<#= type.FullName #>>(askText);
+    public static <#= type.Name #>? For<#= type.Name #>(
+        ConsoleString askText,
+        bool writeAskTextLine = true,
+        ConsoleString invalidFormatText = default,
+        CancellationToken cancellationToken = default)
+        => ForValue<<#= type.FullName #>>(
+            askText,
+            writeAskTextLine,
+            invalidFormatText,
+            cancellationToken);
 
 <#
     }

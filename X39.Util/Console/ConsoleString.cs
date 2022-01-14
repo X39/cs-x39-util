@@ -7,12 +7,27 @@ public readonly record struct ConsoleString
     public ConsoleColor Background { get; init; } = System.Console.BackgroundColor;
     public string Text { get; init; } = string.Empty;
 
-
     public ConsoleString(string text)
     {
         Text = text;
     }
 
+    /// <summary>
+    /// Method to deconstruct the ConsoleString.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var (foreground, background, text) = consoleString;
+    /// </code>
+    /// </example>
+    /// <example>
+    /// <code>
+    /// consoleString.Deconstruct(out var foreground, out var background, out var text);
+    /// </code>
+    /// </example>
+    /// <param name="foreground">Will contain contents of <see cref="Foreground"/></param>
+    /// <param name="background">Will contain contents of <see cref="Background"/></param>
+    /// <param name="text">Will contain contents of <see cref="Text"/></param>
     public void Deconstruct(out ConsoleColor foreground, out ConsoleColor background, out string text)
     {
         foreground = Foreground;
@@ -69,5 +84,28 @@ public readonly record struct ConsoleString
         if (Text.Contains('\n'))
             throw new InvalidOperationException("Cannot clear console strings containing line terminator.");
         System.Console.Write(string.Concat('\r', new string(' ', Text.Length), '\r'));
+    }
+
+    /// <summary>
+    /// Creates and returns a new <see cref="ConsoleString"/> that has the given
+    /// <paramref name="text"/> prepended to its very own <see cref="Text"/>.
+    /// </summary>
+    /// <param name="text">The text to prepend.</param>
+    /// <returns>A new <see cref="ConsoleString"/> that has the given
+    /// <paramref name="text"/> prepended to its very own <see cref="Text"/>.</returns>
+    public ConsoleString Prepend(string text)
+    {
+        return this with {Text = string.Concat(text, Text)};
+    }
+    /// <summary>
+    /// Creates and returns a new <see cref="ConsoleString"/> that has the given
+    /// <paramref name="text"/> appended to its very own <see cref="Text"/>.
+    /// </summary>
+    /// <param name="text">The text to append.</param>
+    /// <returns>A new <see cref="ConsoleString"/> that has the given
+    /// <paramref name="text"/> appended to its very own <see cref="Text"/>.</returns>
+    public ConsoleString Append(string text)
+    {
+        return this with {Text = string.Concat(Text, text)};
     }
 }

@@ -1,5 +1,5 @@
 # X39.Util
-X39.Util hosted in the `cs-x39-util` repository, is my personal utility library,
+`X39.Util` hosted in the `cs-x39-util` repository, is my personal utility library,
 containing commonly used methods and classes.
 
 # Licence
