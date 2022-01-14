@@ -46,7 +46,7 @@ public static class TestHelpers
             }
         });
         thread.Start();
-        await Task.WhenAny(Task.Delay(1000), Task.Run(() => thread.Join()));
+        await Task.WhenAny(Task.Delay(2000), Task.Run(() => thread.Join()));
         if (thread.IsAlive)
         {
             thread.Interrupt();
