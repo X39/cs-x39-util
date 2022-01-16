@@ -6,7 +6,7 @@ namespace X39.Util.Collections;
 /// Contains extension methods for <see cref="ICollection{T}"/>
 /// </summary>
 [PublicAPI]
-public static class Collection
+public static class CollectionExtensionMethods
 {
     /// <summary>
     /// Utility method that first checks the given <paramref name="predicate"/>

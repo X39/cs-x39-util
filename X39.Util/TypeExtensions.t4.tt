@@ -1,0 +1,66 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core, Version=4.0.0.0, Culture=neutral" #>
+<#@ Assembly Name="Microsoft.CSharp, Version=4.0.0.0, Culture=neutral" #>
+
+using System.Linq.Expressions;
+
+namespace X39.Util;
+public static partial class TypeExtensionMethods
+{
+<#
+    for (var i = 1; i < 10; i++)
+    {
+#>
+    public static object CreateInstance<<#
+        for (var j = 1; j <= i; j++)
+        {
+            Write(j != i ? $"TArg{j}, " : $"TArg{j}");
+        }
+#>>(
+        this Type t<#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($",\r\n        TArg{j} arg{j}");
+        }
+#>)
+    {
+        var constructor = t.GetConstructor(new[] {
+            <#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"typeof(TArg{j})");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+        }
+#>});
+        if (constructor == null)
+        {
+            var ex = new InvalidOperationException("No matching constructor existing.");
+            ex.Data.Add("Target", t);
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+            ex.Data.Add(typeof(TArg<#= j #>), arg1);
+<#
+        }
+#>
+            throw ex;
+        }
+        var expParameters = new Expression[] {
+            <#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"Expression.Constant(arg{j})");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+        }
+#>};
+        var expNew = Expression.New(constructor, expParameters);
+        var result = Expression.Lambda(expNew).Compile().DynamicInvoke();
+        return result
+               ?? throw new NullReferenceException("Constructor yielded null result.");
+    }
+<#
+    }
+#>
+}

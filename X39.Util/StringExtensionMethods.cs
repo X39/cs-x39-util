@@ -2,6 +2,9 @@
 
 namespace X39.Util;
 
+/// <summary>
+/// Contains utility classes for <see cref="System.String"/>
+/// </summary>
 public static class StringExtensionMethods
 {
     /// <summary>

@@ -3,7 +3,7 @@
 namespace X39.Util.Threading;
 
 /// <summary>
-/// Contains utility classes for ReaderWriterLockSlim
+/// Contains utility classes for <see cref="ReaderWriterLockSlim"/>
 /// </summary>
 public static class ReaderWriterLockSlimExtensions
 {

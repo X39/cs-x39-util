@@ -28,3 +28,4 @@ public readonly struct PromiseAwaiter : INotifyCompletion
     internal PromiseAwaiter(Promise promise) => _promise = promise;
     public void OnCompleted(Action completion) => _promise.Callbacks.Add(completion);
 }
+

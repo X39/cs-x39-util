@@ -26,6 +26,10 @@
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>AskConsole.t4.cs</LastGenOutput>
       </None>
+      <None Update="TypeExtensions.t4.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>TypeExtensions.t4.cs</LastGenOutput>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -33,6 +37,11 @@
         <AutoGen>True</AutoGen>
         <DesignTime>True</DesignTime>
         <DependentUpon>AskConsole.t4.tt</DependentUpon>
+      </Compile>
+      <Compile Update="TypeExtensions.t4.cs">
+        <AutoGen>True</AutoGen>
+        <DesignTime>True</DesignTime>
+        <DependentUpon>TypeExtensions.t4.tt</DependentUpon>
       </Compile>
     </ItemGroup>
 
