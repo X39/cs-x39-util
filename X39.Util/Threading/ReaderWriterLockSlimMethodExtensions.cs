@@ -1,11 +1,10 @@
-﻿using System.Threading;
-
-namespace X39.Util.Threading;
+﻿namespace X39.Util.Threading;
 
 /// <summary>
 /// Contains utility classes for <see cref="ReaderWriterLockSlim"/>
 /// </summary>
-public static class ReaderWriterLockSlimExtensions
+[PublicAPI]
+public static class ReaderWriterLockSlimMethodExtensions
 {
     /// <summary>
     /// Calls <see cref="ReaderWriterLockSlim.EnterReadLock"/> to enter the read-lock
