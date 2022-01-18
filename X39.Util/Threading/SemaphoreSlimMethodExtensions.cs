@@ -14,7 +14,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="SemaphoreSlim"/> object has been disposed.</exception>
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
-    public static void ReadLocked(
+    public static void Locked(
         this SemaphoreSlim semaphoreSlim,
         Action action)
     {
@@ -38,7 +38,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static void ReadLocked(
+    public static void Locked(
         this SemaphoreSlim semaphoreSlim,
         Action action,
         CancellationToken cancellationToken)
@@ -62,7 +62,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
-    public static T ReadLocked<T>(
+    public static T Locked<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<T> action)
     {
@@ -86,7 +86,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static T ReadLocked<T>(
+    public static T Locked<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<T> action,
         CancellationToken cancellationToken)
@@ -109,7 +109,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="SemaphoreSlim"/> object has been disposed.</exception>
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
-    public static async Task ReadLockedAsync(
+    public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
         Action action)
     {
@@ -132,7 +132,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static async Task ReadLockedAsync(
+    public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
         Action action,
         CancellationToken cancellationToken)
@@ -155,7 +155,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="SemaphoreSlim"/> object has been disposed.</exception>
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
-    public static async Task ReadLockedAsync(
+    public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
         Func<Task> action)
     {
@@ -178,7 +178,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static async Task ReadLockedAsync(
+    public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
         Func<Task> action,
         CancellationToken cancellationToken)
@@ -202,7 +202,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
-    public static async Task<T> ReadLockedAsync<T>(
+    public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<T> action)
     {
@@ -226,7 +226,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static async Task<T> ReadLockedAsync<T>(
+    public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<T> action,
         CancellationToken cancellationToken)
@@ -250,7 +250,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="semaphoreSlim">The valid <see cref="SemaphoreSlim"/> instance.</param>
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
-    public static async Task<T> ReadLockedAsync<T>(
+    public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<Task<T>> action)
     {
@@ -274,7 +274,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     /// <typeparam name="T">The data type returned.</typeparam>
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
-    public static async Task<T> ReadLockedAsync<T>(
+    public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
         Func<Task<T>> action,
         CancellationToken cancellationToken)
