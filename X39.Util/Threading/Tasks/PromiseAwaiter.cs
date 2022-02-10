@@ -2,6 +2,7 @@
 
 namespace X39.Util.Threading.Tasks;
 
+[PublicAPI]
 public readonly struct PromiseAwaiter : INotifyCompletion
 {
     private readonly Promise _promise;
