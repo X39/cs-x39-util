@@ -126,9 +126,9 @@ namespace X39.Util.Console
         public void Cancel() => _cancellationTokenSource.Cancel();
 
         public void CancelAfter(TimeSpan delay) => _cancellationTokenSource.CancelAfter(delay);
-
+#if NET6_0_OR_GREATER
         public bool TryReset() => _cancellationTokenSource.TryReset();
-
+#endif
         private void ConsoleOnCancelKeyPress(object? sender, ConsoleCancelEventArgs args)
         {
             if (args.SpecialKey != _consoleSpecialKey

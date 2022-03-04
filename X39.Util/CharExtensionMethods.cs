@@ -54,11 +54,13 @@ public static class CharExtensionMethods
     public static bool IsNumber(this char c)
         => char.IsNumber(c);
 
+#if NET6_0_OR_GREATER
     /// <inheritdoc cref="char.IsAscii(char)"/>
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsAscii(this char c)
         => char.IsAscii(c);
+#endif
 
     /// <inheritdoc cref="char.IsDigit(char)"/>
     [Pure]
