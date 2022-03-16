@@ -3,7 +3,11 @@ using JetBrains.Annotations;
 namespace X39.Util.Console
 {
     [PublicAPI]
-    public sealed class ConsoleCancellationTokenSource : IDisposable, IAsyncDisposable
+    public sealed class ConsoleCancellationTokenSource :
+        IDisposable
+#if NET5_0_OR_GREATER
+        , IAsyncDisposable
+#endif
     {
         [PublicAPI]
         public enum EOnCancelResult
@@ -31,6 +35,7 @@ namespace X39.Util.Console
             }
         }
 
+        #if NET5_0_OR_GREATER
         public ValueTask DisposeAsync()
         {
             System.Console.CancelKeyPress -= ConsoleOnCancelKeyPress;
@@ -41,6 +46,7 @@ namespace X39.Util.Console
             }
             return default;
         }
+        #endif
 
         /// <summary>
         /// Creates a new <see cref="CancellationToken"/> source that is

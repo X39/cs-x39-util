@@ -1,11 +1,20 @@
 ﻿namespace X39.Util.Console;
+
 [PublicAPI]
 
+#if NET5_0_OR_GREATER
 public readonly record struct ConsoleString
 {
     public ConsoleColor Foreground { get; init; } = System.Console.ForegroundColor;
     public ConsoleColor Background { get; init; } = System.Console.BackgroundColor;
     public string Text { get; init; } = string.Empty;
+#else
+public struct ConsoleString
+{
+    public ConsoleColor Foreground { get; set; } = System.Console.ForegroundColor;
+    public ConsoleColor Background { get; set; } = System.Console.BackgroundColor;
+    public string Text { get; set; } = string.Empty;
+#endif
 
     public ConsoleString(string text)
     {
@@ -40,7 +49,7 @@ public readonly record struct ConsoleString
     /// </summary>
     /// <param name="text">The <see cref="string"/> to use.</param>
     /// <returns>A valid <see cref="ConsoleString"/> structure.</returns>
-    public static implicit operator ConsoleString(string text) => new() { Text = text };
+    public static implicit operator ConsoleString(string text) => new() {Text = text};
 
     /// <summary>
     /// Implicitly converts the given <see cref="ConsoleString"/> back to a <see cref="string"/>.
@@ -60,6 +69,7 @@ public readonly record struct ConsoleString
         System.Console.Write(Text);
         System.Console.ResetColor();
     }
+
     /// <summary>
     /// Writes the <see cref="Text"/> string value, followed by the current line terminator, to the standard output
     /// </summary>
@@ -71,6 +81,7 @@ public readonly record struct ConsoleString
         System.Console.WriteLine(Text);
         System.Console.ResetColor();
     }
+
     /// <summary>
     /// Emits the '\b' character enough times to clear the line from this <see cref="ConsoleString"/>.
     /// </summary>
@@ -97,6 +108,7 @@ public readonly record struct ConsoleString
     {
         return this with {Text = string.Concat(text, Text)};
     }
+
     /// <summary>
     /// Creates and returns a new <see cref="ConsoleString"/> that has the given
     /// <paramref name="text"/> appended to its very own <see cref="Text"/>.

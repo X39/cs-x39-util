@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace X39.Util;
@@ -17,16 +18,19 @@ public static partial class TypeExtensionMethods
             return t.Name;
         if (!t.IsGenericType)
             return t.FullName?.Replace('+', '.') ?? "NULL";
-        
+
         var builder = new StringBuilder();
         builder.Append(t.Namespace);
         builder.Append('.');
+#if NET5_0_OR_GREATER
         builder.Append(t.Name[..t.Name.IndexOf('`')].Replace('+', '.'));
+#else
+        builder.Append(t.Name.Substring(0, t.Name.IndexOf('`')).Replace('+', '-'));
+#endif
         builder.Append('<');
         builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
         builder.Append('>');
         return builder.ToString();
-
     }
 
     /// <summary>
@@ -38,12 +42,15 @@ public static partial class TypeExtensionMethods
     {
         if (!t.IsGenericType) return t.Name;
         var builder = new StringBuilder();
+#if NET5_0_OR_GREATER
         builder.Append(t.Name[..t.Name.IndexOf('`')]);
+#else
+        builder.Append(t.Name.Substring(0, t.Name.IndexOf('`')));
+#endif
         builder.Append('<');
         builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
         builder.Append('>');
         return builder.ToString();
-
     }
 
     /// <summary>
@@ -133,5 +140,11 @@ public static partial class TypeExtensionMethods
         var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
         var @delegate = lambdaExpression.Compile();
         return (T) @delegate.DynamicInvoke(args)!;
+    }
+
+    /// <inheritdoc cref="RuntimeHelpers.RunClassConstructor"/>
+    public static void RunClassConstructors(this Type type)
+    {
+        RuntimeHelpers.RunClassConstructor(type.TypeHandle);
     }
 }
