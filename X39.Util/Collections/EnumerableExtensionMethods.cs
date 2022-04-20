@@ -1,4 +1,6 @@
-﻿namespace X39.Util.Collections;
+﻿using System.Collections.Generic;
+
+namespace X39.Util.Collections;
 
 [PublicAPI]
 public static class EnumerableExtensionMethods
@@ -10,7 +12,7 @@ public static class EnumerableExtensionMethods
     /// <returns>
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
-    public static IEnumerable<T> DropNull<T>(this IEnumerable<T?>? source)
+    public static IEnumerable<T> DropNull<T>(this IEnumerable<T?> source)
         where T : class
     {
         if (source is null)
@@ -27,7 +29,7 @@ public static class EnumerableExtensionMethods
     /// <returns>
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?>? source)
+    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> source)
         where T : class
     {
         if (source is null)
@@ -45,12 +47,39 @@ public static class EnumerableExtensionMethods
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
     // ReSharper disable once ConvertNullableToShortForm
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<Nullable<T>>? source)
+    public static IEnumerable<T> NotNull<T>(this IEnumerable<Nullable<T>> source)
         where T : struct
     {
         if (source is null)
             throw new ArgumentNullException(nameof(source), nameof(source) + " is null.");
 
         return source.Where((t) => t.HasValue).Select((t) => t!.Value);
+    }
+    
+    
+
+    /// <summary>Determines whether all elements of a sequence do not satisfy a condition.</summary>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> that contains the elements to apply the predicate to.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
+    /// <exception cref="T:System.ArgumentNullException">
+    /// <paramref name="source" /> is <see langword="null" />.
+    /// </exception>
+    /// <exception cref="T:System.ArgumentNullException">
+    /// <paramref name="predicate" /> is <see langword="null" />.
+    /// </exception>
+    /// <returns>
+    /// <see langword="false" /> if any element of the source sequence passes the test in the specified predicate;
+    /// otherwise, <see langword="true" />.
+    /// </returns>
+    // ReSharper disable once ConvertNullableToShortForm
+    public static bool None<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+    {
+        if (source is null)
+            throw new ArgumentNullException(nameof(source), nameof(source) + " is null.");
+        if (predicate is null)
+            throw new ArgumentNullException(nameof(predicate), nameof(predicate) + " is null.");
+
+        return !source.Any(predicate);
     }
 }
