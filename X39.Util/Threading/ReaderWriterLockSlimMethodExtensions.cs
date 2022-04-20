@@ -28,7 +28,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="ReaderWriterLockSlim"/> object has been disposed.</exception>
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
-    public static void ReadLocked(this ReaderWriterLockSlim readerWriterLockSlim, Action action)
+    public static void ReadLocked(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Action action)
     {
         readerWriterLockSlim.EnterReadLock();
         try
@@ -60,7 +62,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="ReaderWriterLockSlim"/> object has been disposed.</exception>
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
-    public static void WriteLocked(this ReaderWriterLockSlim readerWriterLockSlim, Action action)
+    public static void WriteLocked(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Action action)
     {
         readerWriterLockSlim.EnterWriteLock();
         try
@@ -96,7 +100,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <exception cref="ObjectDisposedException">The <see cref="ReaderWriterLockSlim"/> object has been disposed.</exception>
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
-    public static void UpgradeableReadLocked(this ReaderWriterLockSlim readerWriterLockSlim, Action action)
+    public static void UpgradeableReadLocked(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Action action)
     {
         readerWriterLockSlim.EnterUpgradeableReadLock();
         try
@@ -132,7 +138,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
     /// <returns>The value, returned by <paramref name="action"/>.</returns>
-    public static T ReadLocked<T>(this ReaderWriterLockSlim readerWriterLockSlim, Func<T> action)
+    public static T ReadLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<T> action)
     {
         readerWriterLockSlim.EnterReadLock();
         try
@@ -165,7 +173,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
     /// <returns>The value, returned by <paramref name="action"/>.</returns>
-    public static T WriteLocked<T>(this ReaderWriterLockSlim readerWriterLockSlim, Func<T> action)
+    public static T WriteLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<T> action)
     {
         readerWriterLockSlim.EnterWriteLock();
         try
@@ -202,7 +212,9 @@ public static class ReaderWriterLockSlimMethodExtensions
     /// <param name="readerWriterLockSlim">The valid <see cref="ReaderWriterLockSlim"/> instance.</param>
     /// <param name="action">The action to perform read-locked.</param>
     /// <returns>The value, returned by <paramref name="action"/>.</returns>
-    public static T UpgradeableReadLocked<T>(this ReaderWriterLockSlim readerWriterLockSlim, Func<T> action)
+    public static T UpgradeableReadLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<T> action)
     {
         readerWriterLockSlim.EnterUpgradeableReadLock();
         try

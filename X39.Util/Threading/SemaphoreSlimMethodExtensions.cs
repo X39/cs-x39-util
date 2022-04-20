@@ -16,7 +16,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     public static void Locked(
         this SemaphoreSlim semaphoreSlim,
-        Action action)
+        [InstantHandle] Action action)
     {
         semaphoreSlim.Wait();
         try
@@ -40,7 +40,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static void Locked(
         this SemaphoreSlim semaphoreSlim,
-        Action action,
+        [InstantHandle] Action action,
         CancellationToken cancellationToken)
     {
         semaphoreSlim.Wait(cancellationToken);
@@ -64,7 +64,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <typeparam name="T">The data type returned.</typeparam>
     public static T Locked<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<T> action)
+        [InstantHandle] Func<T> action)
     {
         semaphoreSlim.Wait();
         try
@@ -88,7 +88,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static T Locked<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<T> action,
+        [InstantHandle] Func<T> action,
         CancellationToken cancellationToken)
     {
         semaphoreSlim.Wait(cancellationToken);
@@ -111,7 +111,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
-        Action action)
+        [InstantHandle] Action action)
     {
         await semaphoreSlim.WaitAsync();
         try
@@ -134,7 +134,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
-        Action action,
+        [InstantHandle] Action action,
         CancellationToken cancellationToken)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
@@ -157,7 +157,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="action">The action to perform locked.</param>
     public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
-        Func<Task> action)
+        [InstantHandle] Func<Task> action)
     {
         await semaphoreSlim.WaitAsync();
         try
@@ -180,7 +180,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static async Task LockedAsync(
         this SemaphoreSlim semaphoreSlim,
-        Func<Task> action,
+        [InstantHandle] Func<Task> action,
         CancellationToken cancellationToken)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
@@ -204,7 +204,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <typeparam name="T">The data type returned.</typeparam>
     public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<T> action)
+        [InstantHandle] Func<T> action)
     {
         await semaphoreSlim.WaitAsync();
         try
@@ -228,7 +228,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<T> action,
+        [InstantHandle] Func<T> action,
         CancellationToken cancellationToken)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
@@ -252,7 +252,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <typeparam name="T">The data type returned.</typeparam>
     public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<Task<T>> action)
+        [InstantHandle] Func<Task<T>> action)
     {
         await semaphoreSlim.WaitAsync();
         try
@@ -276,7 +276,7 @@ public static class SemaphoreSlimMethodExtensions
     /// <param name="cancellationToken">Allows to cancel the wait for lock.</param>
     public static async Task<T> LockedAsync<T>(
         this SemaphoreSlim semaphoreSlim,
-        Func<Task<T>> action,
+        [InstantHandle] Func<Task<T>> action,
         CancellationToken cancellationToken)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);

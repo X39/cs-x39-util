@@ -18,7 +18,10 @@ public static class CollectionExtensionMethods
     /// <param name="predicate">A function that can check, whether the value should be added.</param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void AddIf<T>(this ICollection<T> collection, T value, Func<bool> predicate)
+    public static void AddIf<T>(
+        this ICollection<T> collection,
+        T value,
+        [InstantHandle]Func<bool> predicate)
     {
         if (predicate())
             collection.Add(value);
@@ -31,7 +34,9 @@ public static class CollectionExtensionMethods
     /// <param name="range">The elements to add to the <paramref name="collection"/>.</param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> range)
+    public static void AddRange<T>(
+        this ICollection<T> collection,
+        IEnumerable<T> range)
     {
         foreach (var t in range)
         {
@@ -47,7 +52,9 @@ public static class CollectionExtensionMethods
     /// <param name="range">The elements to remove from the <paramref name="collection"/>.</param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void RemoveRange<T>(this ICollection<T> collection, IEnumerable<T> range)
+    public static void RemoveRange<T>(
+        this ICollection<T> collection,
+        IEnumerable<T> range)
     {
         foreach (var t in range)
         {
@@ -63,7 +70,9 @@ public static class CollectionExtensionMethods
     /// <param name="value">The element to add to the <paramref name="collection"/>.</param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T AddAndReturn<T>(this ICollection<T> collection, T value)
+    public static T AddAndReturn<T>(
+        this ICollection<T> collection,
+        T value)
     {
         collection.Add(value);
         return value;
@@ -81,7 +90,10 @@ public static class CollectionExtensionMethods
     /// </param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T FirstOrAdd<T>(this ICollection<T> collection, Func<T, bool> predicate, Func<T> factory)
+    public static T FirstOrAdd<T>(
+        this ICollection<T> collection,
+        [InstantHandle]Func<T, bool> predicate,
+        [InstantHandle]Func<T> factory)
     {
         var first = collection.FirstOrDefault(predicate);
         if (!EqualityComparer<T>.Default.Equals(first, default))
@@ -100,7 +112,10 @@ public static class CollectionExtensionMethods
     /// <param name="value">The value added if no element matches the <paramref name="predicate"/>.</param>
     /// <typeparam name="T">The type of the collection</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T FirstOrAdd<T>(this ICollection<T> collection, Func<T, bool> predicate, T value)
+    public static T FirstOrAdd<T>(
+        this ICollection<T> collection,
+        [InstantHandle]Func<T, bool> predicate,
+        T value)
         where T : struct
     {
         var first = collection.FirstOrDefault(predicate);
@@ -122,8 +137,10 @@ public static class CollectionExtensionMethods
     /// added if no element matches the <paramref name="predicate"/>.
     /// </param>
     /// <typeparam name="T">The type of the collection</typeparam>
-    public static async Task<T> FirstOrAddAsync<T>(this ICollection<T> collection, Func<T, bool> predicate,
-        Func<Task<T>> factory)
+    public static async Task<T> FirstOrAddAsync<T>(
+        this ICollection<T> collection,
+        [InstantHandle]Func<T, bool> predicate,
+        [InstantHandle]Func<Task<T>> factory)
     {
         var first = collection.FirstOrDefault(predicate);
         if (!EqualityComparer<T>.Default.Equals(first, default))
