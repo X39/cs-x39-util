@@ -21,4 +21,32 @@ public static class StringExtensionMethods
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
         => string.IsNullOrEmpty(value);
+
+    /// <inheritdoc cref="string.Format(string,object)"/>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [StringFormatMethod("format")]
+    public static string Format(this string format, object arg0)
+        => string.Format(format, arg0);
+    
+    /// <inheritdoc cref="string.Format(string,object,object)"/>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [StringFormatMethod("format")]
+    public static string Format(this string format, object arg0, object arg1)
+        => string.Format(format, arg0, arg1);
+    
+    /// <inheritdoc cref="string.Format(string,object,object, object)"/>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [StringFormatMethod("format")]
+    public static string Format(this string format, object arg0, object arg1, object arg2)
+        => string.Format(format, arg0, arg1, arg2);
+    
+    /// <inheritdoc cref="string.Format(string,object[])"/>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [StringFormatMethod("format")]
+    public static string Format(this string format, params object[] args)
+        => string.Format(format, args);
 }
