@@ -53,6 +53,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -76,6 +77,13 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
+    [Obsolete("Use LockedAsync instead.", true)]
+    public static Task<T> Locked<T>(
+        this SemaphoreSlim semaphoreSlim,
+        [InstantHandle] Func<Task<T>> action)
+        => throw new InvalidOperationException("Use the Async overload instead.");
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -101,6 +109,14 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
+    [Obsolete("Use LockedAsync instead.", true)]
+    public static Task<T> Locked<T>(
+        this SemaphoreSlim semaphoreSlim,
+        [InstantHandle] Func<Task<T>> action,
+        CancellationToken cancellationToken)
+        => throw new InvalidOperationException("Use the Async overload instead.");
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -123,6 +139,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -147,6 +164,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -169,6 +187,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -193,6 +212,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -216,6 +236,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -241,6 +262,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -264,6 +286,7 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
+
     /// <summary>
     /// Calls <see cref="SemaphoreSlim.WaitAsync()"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -289,5 +312,4 @@ public static class SemaphoreSlimMethodExtensions
             semaphoreSlim.Release();
         }
     }
-
 }
