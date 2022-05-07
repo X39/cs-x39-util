@@ -1,8 +1,15 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using X39.Util.Threading;
 
 namespace X39.Util.Collections.Concurrent;
 
+/// <summary>
+/// A concurrent <see cref="IDictionary{TKey,TValue}"/> that works by utilizing
+/// <see cref="ReaderWriterLockSlim"/> for all operations.
+/// </summary>
+/// <typeparam name="TKey">The key type.</typeparam>
+/// <typeparam name="TValue">The value type.</typeparam>
 [PublicAPI]
 // ReSharper disable once InconsistentNaming
 public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
@@ -51,68 +58,28 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     /// Thread safety guaranteed by entering a write-lock.
     /// </remarks>
     public void Add(KeyValuePair<TKey, TValue> item)
-    {
-        _lock.EnterWriteLock();
-        try
-        {
-            ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).Add(item);
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
-    }
+        => _lock.WriteLocked(() => ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).Add(item));
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.Clear"/>
     /// <remarks>
     /// Thread safety guaranteed by entering a write-lock.
     /// </remarks>
     public void Clear()
-    {
-        _lock.EnterWriteLock();
-        try
-        {
-            _dictionary.Clear();
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
-    }
+        => _lock.WriteLocked(() => _dictionary.Clear());
 
     /// <inheritdoc cref="ICollection{T}.Contains"/>
     /// <remarks>
     /// Thread safety guaranteed by entering a read-lock.
     /// </remarks>
     public bool Contains(KeyValuePair<TKey, TValue> item)
-    {
-        _lock.EnterReadLock();
-        try
-        {
-            return _dictionary.Contains(item);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
-    }
+        => _lock.ReadLocked(() => _dictionary.Contains(item));
 
     /// <inheritdoc cref="ICollection{T}.CopyTo"/>
     /// <remarks>
     /// Thread safety guaranteed by entering a read-lock.
     /// </remarks>
     void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-    {
-        _lock.EnterReadLock();
-        try
-        {
-            ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).CopyTo(array, arrayIndex);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
-    }
+        => _lock.ReadLocked(() => ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).CopyTo(array, arrayIndex));
 
     /// <inheritdoc cref="ICollection{T}.Remove"/>
     /// <remarks>
@@ -120,27 +87,10 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     /// checking whether the dictionary actually contains the key and then entering the write-lock.
     /// </remarks>
     public bool Remove(KeyValuePair<TKey, TValue> item)
-    {
-        _lock.EnterUpgradeableReadLock();
-        try
-        {
-            if (!_dictionary.Contains(item))
-                return false;
-            _lock.EnterWriteLock();
-            try
-            {
-                return ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).Remove(item);
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-        }
-        finally
-        {
-            _lock.ExitUpgradeableReadLock();
-        }
-    }
+        => _lock.UpgradeableReadLocked(
+            () => _dictionary.Contains(item)
+                  && _lock.WriteLocked(
+                      () => ((ICollection<KeyValuePair<TKey, TValue>>) _dictionary).Remove(item)));
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.Count"/>
     public int Count
@@ -155,34 +105,14 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     /// Thread safety guaranteed by entering a write-lock.
     /// </remarks>
     void IDictionary<TKey, TValue>.Add(TKey key, TValue value)
-    {
-        _lock.EnterWriteLock();
-        try
-        {
-            _dictionary.Add(key, value);
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
-    }
+        => _lock.WriteLocked(() => _dictionary.Add(key, value));
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.ContainsKey"/>
     /// <remarks>
     /// Thread safety guaranteed by entering a read-lock.
     /// </remarks>
     bool IDictionary<TKey, TValue>.ContainsKey(TKey key)
-    {
-        _lock.EnterReadLock();
-        try
-        {
-            return _dictionary.ContainsKey(key);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
-    }
+        => _lock.ReadLocked(() => _dictionary.ContainsKey(key));
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.Remove(TKey)"/>
     /// <remarks>
@@ -190,27 +120,9 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     /// checking whether the dictionary actually contains the key and then entering the write-lock.
     /// </remarks>
     public bool Remove(TKey key)
-    {
-        _lock.EnterUpgradeableReadLock();
-        try
-        {
-            if (!_dictionary.ContainsKey(key))
-                return false;
-            _lock.EnterWriteLock();
-            try
-            {
-                return _dictionary.Remove(key);
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-        }
-        finally
-        {
-            _lock.ExitUpgradeableReadLock();
-        }
-    }
+        => _lock.UpgradeableReadLocked(
+            () => _dictionary.ContainsKey(key)
+                  && _lock.WriteLocked(() => _dictionary.Remove(key)));
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.TryGetValue"/>
     /// <remarks>
@@ -219,18 +131,17 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     // ReSharper disable once ArgumentsStyleLiteral
     // ReSharper disable once RedundantNullableFlowAttribute
 #pragma warning disable CS8767
-    public bool TryGetValue(TKey key, [MaybeNullWhen(returnValue: false)] out TValue? value)
+    public bool TryGetValue(TKey key, [NotNullWhen(returnValue: true)] out TValue? value)
 #pragma warning restore CS8767
     {
-        _lock.EnterReadLock();
-        try
+        TValue? tmp = default!;
+        var result = _lock.ReadLocked(() =>
         {
-            return _dictionary.TryGetValue(key, out value);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+            var tmpResult = _dictionary.TryGetValue(key, out tmp);
+            return tmpResult;
+        });
+        value = tmp;
+        return result;
     }
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.this"/>
@@ -240,30 +151,8 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     /// </remarks>
     public TValue this[TKey key]
     {
-        get
-        {
-            _lock.EnterReadLock();
-            try
-            {
-                return _dictionary[key];
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
-        }
-        set
-        {
-            _lock.EnterWriteLock();
-            try
-            {
-                _dictionary[key] = value;
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-        }
+        get => _lock.ReadLocked(() => _dictionary[key]);
+        set => _lock.WriteLocked(() => _dictionary[key] = value);
     }
 
     ICollection<TKey> IDictionary<TKey, TValue>.Keys
