@@ -12,6 +12,15 @@ public static partial class TypeExtensionMethods
     for (var i = 1; i < 10; i++)
     {
 #>
+    private static readonly Dictionary<(
+            Type,
+            <#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"Type");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+        }
+#>), Delegate> CreateInstanceDelegate<#= i #>Cache = new(); 
     public static object CreateInstance<<#
         for (var j = 1; j <= i; j++)
         {
@@ -25,6 +34,24 @@ public static partial class TypeExtensionMethods
         }
 #>)
     {
+        var key = (
+            t,
+            <#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"typeof(TArg{j})");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+        }
+#>);
+        if (CreateInstanceDelegate<#= i #>Cache.TryGetValue(key, out var del))
+            return del.DynamicInvoke(<#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"arg{j}");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+            
+        }#>)
+                ?? throw new NullReferenceException("Constructor yielded null result.");
         var constructor = t.GetConstructor(new[] {
             <#
         for (var j = 1; j <= i; j++)
@@ -51,12 +78,19 @@ public static partial class TypeExtensionMethods
             <#
         for (var j = 1; j <= i; j++)
         {
-            Write($"Expression.Constant(arg{j})");
+            Write($"Expression.Parameter(typeof(TArg{j}))");
             Write(j != i ? ",\r\n            " : "\r\n            ");
         }
 #>};
         var expNew = Expression.New(constructor, expParameters);
-        var result = Expression.Lambda(expNew).Compile().DynamicInvoke();
+        CreateInstanceDelegate<#= i #>Cache[key] = del = Expression.Lambda(expNew, expParameters.Cast<ParameterExpression>()).Compile();
+        var result = del.DynamicInvoke(<#
+        for (var j = 1; j <= i; j++)
+        {
+            Write($"arg{j}");
+            Write(j != i ? ",\r\n            " : "\r\n            ");
+            
+        }#>);
         return result
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
