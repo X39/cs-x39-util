@@ -96,8 +96,9 @@ public static class CollectionExtensionMethods
         [InstantHandle]Func<T> factory)
     {
         var first = collection.FirstOrDefault(predicate);
-        if (!EqualityComparer<T>.Default.Equals(first, default))
+        if (!EqualityComparer<T>.Default.Equals(first, default!))
             return first!;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         return first is not null && predicate(first)
             ? first
             : collection.AddAndReturn(factory());
@@ -143,7 +144,7 @@ public static class CollectionExtensionMethods
         [InstantHandle]Func<Task<T>> factory)
     {
         var first = collection.FirstOrDefault(predicate);
-        if (!EqualityComparer<T>.Default.Equals(first, default))
+        if (!EqualityComparer<T>.Default.Equals(first, default!))
             return first!;
         first = await factory();
         collection.Add(first);

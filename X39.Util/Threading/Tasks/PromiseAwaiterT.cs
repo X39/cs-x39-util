@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace X39.Util.Threading.Tasks;
 
@@ -8,8 +7,6 @@ public readonly struct PromiseAwaiter<T> : INotifyCompletion
     private readonly Promise<T> _promise;
     public bool IsCompleted => _promise.State != EPromiseState.Primed;
 
-    // ReSharper disable once UseNullableAnnotationInsteadOfAttribute
-    [return: MaybeNull]
     public T GetResult()
     {
         var tmp = _promise;
@@ -18,7 +15,7 @@ public readonly struct PromiseAwaiter<T> : INotifyCompletion
         switch (tmp.State)
         {
             case EPromiseState.Completed:
-                return tmp.Result;
+                return tmp.Result!;
             case EPromiseState.Failed:
                 throw new AggregateException(
                     tmp.Exception

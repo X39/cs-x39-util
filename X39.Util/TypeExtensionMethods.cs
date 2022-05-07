@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using X39.Util.Collections.Concurrent;
 
+#nullable enable
 namespace X39.Util;
-
 [PublicAPI]
 public static partial class TypeExtensionMethods
 {

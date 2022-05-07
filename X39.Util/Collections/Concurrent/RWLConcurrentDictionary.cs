@@ -143,9 +143,10 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> :
     /// </remarks>
     // ReSharper disable once ArgumentsStyleLiteral
     // ReSharper disable once RedundantNullableFlowAttribute
-#pragma warning disable CS8767
-    public bool TryGetValue(TKey key, [NotNullWhen(returnValue: true)] out TValue? value)
-#pragma warning restore CS8767
+    public bool TryGetValue(
+        TKey key,
+        [MaybeNullWhen(returnValue: false)]
+        out TValue value)
     {
         TValue? tmp = default!;
         var result = _lock.ReadLocked(() =>
