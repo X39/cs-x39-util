@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace X39.Util.Collections;
 
@@ -81,5 +82,21 @@ public static class EnumerableExtensionMethods
             throw new ArgumentNullException(nameof(predicate), nameof(predicate) + " is null.");
 
         return !source.Any(predicate);
+    }
+    
+    /// <summary>
+    /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
+    /// an index of the element.
+    /// </summary>
+    /// <remarks>
+    /// Equivalent to calling <code>source.Select((value, index) => (value, index))</code>
+    /// </remarks>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> to add an index to.</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<(T value, int index)> Indexed<T>(this IEnumerable<T> source)
+    {
+        return source.Select((value, index) => (value, index));
     }
 }
