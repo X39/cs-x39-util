@@ -12,7 +12,12 @@ namespace X39.Util.Collections.Concurrent;
 /// <typeparam name="TValue">The value type.</typeparam>
 [PublicAPI]
 // ReSharper disable once InconsistentNaming
-public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
+public sealed class RWLConcurrentDictionary<TKey, TValue> :
+    IDictionary<TKey, TValue>,
+    IDisposable
+#if NET5_0_OR_GREATER
+    , IAsyncDisposable
+#endif
     where TKey : notnull
 {
     private readonly Dictionary<TKey, TValue> _dictionary = new();
@@ -22,6 +27,14 @@ public sealed class RWLConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TV
     {
         _lock.Dispose();
     }
+
+#if NET5_0_OR_GREATER
+    public ValueTask DisposeAsync()
+    {
+        _lock.Dispose();
+        return default;
+    }
+#endif
 
 
     /// <inheritdoc cref="Dictionary{TKey,TValue}.GetEnumerator"/>
