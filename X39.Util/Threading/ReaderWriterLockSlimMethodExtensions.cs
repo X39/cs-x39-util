@@ -153,6 +153,12 @@ public static class ReaderWriterLockSlimMethodExtensions
         }
     }
 
+    [Obsolete("ReaderWriterLockSlim may not be used with async.", true)]
+    public static Task<T> ReadLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<Task<T>> action)
+        => throw new InvalidOperationException("ReaderWriterLockSlim may not be used with async.");
+
     /// <summary>
     /// Calls <see cref="ReaderWriterLockSlim.EnterWriteLock"/> to enter the read-lock
     /// and then wraps <paramref name="action"/> in a try-finally to ensure, exiting
@@ -187,6 +193,12 @@ public static class ReaderWriterLockSlimMethodExtensions
             readerWriterLockSlim.ExitWriteLock();
         }
     }
+
+    [Obsolete("ReaderWriterLockSlim may not be used with async.", true)]
+    public static Task<T> WriteLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<Task<T>> action)
+        => throw new InvalidOperationException("ReaderWriterLockSlim may not be used with async.");
 
     /// <summary>
     /// Calls <see cref="ReaderWriterLockSlim.EnterUpgradeableReadLock"/> to enter the read-lock
@@ -226,4 +238,10 @@ public static class ReaderWriterLockSlimMethodExtensions
             readerWriterLockSlim.ExitUpgradeableReadLock();
         }
     }
+
+    [Obsolete("ReaderWriterLockSlim may not be used with async.", true)]
+    public static Task<T> UpgradeableReadLocked<T>(
+        this ReaderWriterLockSlim readerWriterLockSlim,
+        [InstantHandle] Func<Task<T>> action)
+        => throw new InvalidOperationException("ReaderWriterLockSlim may not be used with async.");
 }
