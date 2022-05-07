@@ -1,12 +1,19 @@
 ﻿using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
+using X39.Util.Collections.Concurrent;
 
 namespace X39.Util;
 
 [PublicAPI]
 public static partial class TypeExtensionMethods
 {
+    // ReSharper disable once IdentifierTypo
+    private static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new(); 
+    private static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new(); 
+    private static readonly RWLConcurrentDictionary<Type, string> NameCache = new(); 
+    private static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
+    private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache = new();
     /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
     /// </summary>
@@ -14,6 +21,8 @@ public static partial class TypeExtensionMethods
     /// <returns></returns>
     public static string FullName(this Type t)
     {
+        if (FullNameCache.TryGetValue(t, out var fullName))
+            return fullName;
         if (t.IsGenericParameter)
             return t.Name;
         if (!t.IsGenericType)
@@ -30,7 +39,7 @@ public static partial class TypeExtensionMethods
         builder.Append('<');
         builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
         builder.Append('>');
-        return builder.ToString();
+        return FullNameCache[t] = builder.ToString();
     }
 
     /// <summary>
@@ -40,6 +49,8 @@ public static partial class TypeExtensionMethods
     /// <returns></returns>
     public static string Name(this Type t)
     {
+        if (NameCache.TryGetValue(t, out var name))
+            return name;
         if (!t.IsGenericType) return t.Name;
         var builder = new StringBuilder();
 #if NET5_0_OR_GREATER
@@ -50,7 +61,7 @@ public static partial class TypeExtensionMethods
         builder.Append('<');
         builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
         builder.Append('>');
-        return builder.ToString();
+        return NameCache[t] = builder.ToString();
     }
 
     /// <summary>
@@ -69,15 +80,17 @@ public static partial class TypeExtensionMethods
     /// <returns>Either <paramref name="type"/> if it was no collection or the collection <see cref="Type"/>.</returns>
     public static Type GetBaseType(this Type type)
     {
+        if (BaseTypeCache.TryGetValue(type, out var baseType))
+            return baseType;
         if (type.IsArray)
         {
-            return type.GetElementType()
-                   ?? throw new NullReferenceException();
+            return BaseTypeCache[type] =type.GetElementType()
+                                        ?? throw new NullReferenceException();
         }
 
         if (type.IsGenericType && typeof(IGrouping<,>).IsEquivalentTo(type.GetGenericTypeDefinition()))
         {
-            return type.GetGenericArguments().Skip(1).First();
+            return BaseTypeCache[type] =type.GetGenericArguments().Skip(1).First();
         }
 
         if (type.IsGenericType && type.GetInterfaces().Any(
@@ -85,11 +98,11 @@ public static partial class TypeExtensionMethods
                     ? typeof(IEnumerable<>).IsEquivalentTo(@interface.GetGenericTypeDefinition())
                     : typeof(System.Collections.IEnumerable).IsEquivalentTo(@interface)))
         {
-            return type.GetGenericArguments().First();
+            return BaseTypeCache[type] =type.GetGenericArguments().First();
         }
 
         // Has no element type, exit
-        return type;
+        return BaseTypeCache[type] = type;
     }
 
     /// <summary>
@@ -104,25 +117,39 @@ public static partial class TypeExtensionMethods
     // ReSharper disable once IdentifierTypo
     public static Type GetDeNulledType(this Type type)
     {
+        // ReSharper disable once IdentifierTypo
+        if (DeNulledTypeCache.TryGetValue(type, out var deNulledType))
+            return deNulledType;
         if (!type.IsGenericType)
         {
             return type;
         }
 
         var genericType = type.GetGenericTypeDefinition();
-        return genericType.IsEquivalentTo(typeof(Nullable<>))
+        return DeNulledTypeCache[type] = genericType.IsEquivalentTo(typeof(Nullable<>))
             ? type.GetGenericArguments().First()
             : type;
     }
 
-    public static T CreateInstance<T>(this Type t) =>
-        (T) Expression.Lambda(Expression.New(t)).Compile().DynamicInvoke()!;
+    public static T CreateInstance<T>(this Type t) => (T) CreateInstance(t);
 
     public static object CreateInstance(this Type t)
-        => Expression.Lambda(Expression.New(t)).Compile().DynamicInvoke()!;
+    {
+        var key = (t, Type.EmptyTypes);
+        if (CreateInstanceCache.TryGetValue(key, out var @delegate))
+            return @delegate.DynamicInvoke()!;
+        CreateInstanceCache[key] = @delegate = Expression.Lambda(Expression.New(t)).Compile();
+        
+        return @delegate.DynamicInvoke()!;
+    }
 
     public static T CreateInstance<T>(this Type t, params object[] args)
+        => (T) CreateInstance(t, args);
+    public static object CreateInstance(this Type t, params object[] args)
     {
+        var key = (t, args.Select((q) => q.GetType()).ToArray());
+        if (CreateInstanceCache.TryGetValue(key, out var @delegate))
+            return @delegate.DynamicInvoke()!;
         var constructor = t.GetConstructor(
                               bindingAttr: System.Reflection.BindingFlags.Public |
                                            System.Reflection.BindingFlags.Instance |
@@ -138,8 +165,8 @@ public static partial class TypeExtensionMethods
         // ReSharper disable once CoVariantArrayConversion
         var newExpression = Expression.New(constructor, parameterExpressions);
         var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
-        var @delegate = lambdaExpression.Compile();
-        return (T) @delegate.DynamicInvoke(args)!;
+        CreateInstanceCache[key] =  @delegate = lambdaExpression.Compile();
+        return @delegate.DynamicInvoke(args)!;
     }
 
     /// <inheritdoc cref="RuntimeHelpers.RunClassConstructor"/>
