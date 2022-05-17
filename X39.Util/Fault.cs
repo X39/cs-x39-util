@@ -9,6 +9,34 @@ namespace X39.Util;
 public static class Fault
 {
     /// <summary>
+    /// Enum to allow an exception handling methods return value
+    /// to be marked with a proper "throw or not to throw" indication
+    /// instead of eg. convention "throw if true, no throw if false".
+    /// </summary>
+    public enum Happened
+    {
+        /// <summary>
+        /// Indicates that an exception should be thrown.
+        /// </summary>
+        Throw,
+
+        /// <summary>
+        /// Indicates that an exception should not be thrown.
+        /// </summary>
+        NoThrow,
+    }
+
+    /// <summary>
+    /// Usability constant to allow semantically nicer access of <see cref="Happened.Throw"/>.
+    /// </summary>
+    public const Happened Throw = Happened.Throw;
+
+    /// <summary>
+    /// Usability constant to allow semantically nicer access of <see cref="Happened.NoThrow"/>.
+    /// </summary>
+    public const Happened NoThrow = Happened.NoThrow;
+
+    /// <summary>
     /// Calls <paramref name="action"/> and ignores any potential exception that may be raised.
     /// </summary>
     /// <param name="action">The action to perform</param>
@@ -111,7 +139,8 @@ public static class Fault
     /// <see langword="false"/> only if <paramref name="action"/> ran without any <see cref="Exception"/>.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<bool> IgnoreAsync([InstantHandle(RequireAwait = true)] Func<Task> action)
+    public static async Task<bool> IgnoreAsync(
+        [InstantHandle(RequireAwait = true)] Func<Task> action)
     {
         try
         {
@@ -134,7 +163,8 @@ public static class Fault
     /// <param name="defaultValue">The value to return in case of an exception</param>
     /// <returns>Either the result of <paramref name="action"/> or <paramref name="defaultValue"/></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<T> IgnoreAsync<T>([InstantHandle(RequireAwait = true)] Func<Task<T>> action,
+    public static async Task<T> IgnoreAsync<T>(
+        [InstantHandle(RequireAwait = true)] Func<Task<T>> action,
         T defaultValue)
     {
         try
