@@ -99,4 +99,21 @@ public static class EnumerableExtensionMethods
     {
         return source.Select((value, index) => (value, index));
     }
+
+    /// <summary>
+    /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
+    /// an index of the element.
+    /// </summary>
+    /// <remarks>
+    /// Equivalent to calling <code>source.Select((value, index) => (value, index + offset))</code>
+    /// </remarks>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> to add an index to.</param>
+    /// <param name="offset">The offset for the index to be inserted.</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<(T value, int index)> Indexed<T>(this IEnumerable<T> source, int offset)
+    {
+        return source.Select((value, index) => (value, index + offset));
+    }
 }
