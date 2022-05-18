@@ -43,7 +43,7 @@ namespace System.Runtime.CompilerServices
     /// Offers compatibility with dotnet core init.
     /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public class IsExternalInit
+    public static class IsExternalInit
     {
     }
 }
