@@ -197,4 +197,17 @@ public static partial class TypeExtensionMethods
     /// <returns><see langword="true"/> if <paramref name="type"/> is equivalent to <paramref name="otherType"/>.</returns>
     public static bool IsGenericType(this Type type, Type otherType)
         => type.IsGenericType && type.GetGenericTypeDefinition().IsEquivalentTo(otherType);
+
+    /// <summary>
+    /// Checks if <paramref name="type"/> is assignable to a generic type.
+    /// </summary>
+    /// <remarks>
+    /// This is equivalent to <see cref="IsGenericType"/> in every aspect but that the check is using
+    /// <see cref="Type.IsAssignableFrom"/> and having the arg and base swapped.
+    /// </remarks>
+    /// <param name="type">The type to check.</param>
+    /// <param name="otherType">The generic type to check against.</param>
+    /// <returns><see langword="true"/> if <paramref name="type"/> is assignable to <paramref name="otherType"/>.</returns>
+    public static bool IsAssignableToGenericType(this Type type, Type otherType)
+        => type.IsGenericType && otherType.IsAssignableFrom(type.GetGenericTypeDefinition());
 }
