@@ -9,6 +9,25 @@ public static class MemberInfoExtensions
     private const string FieldFlagOfNullableContext = "Flag";
     private const string FieldNullableFlagsOfNullable = "NullableFlags";
 
+    /// <summary>
+    /// Checks whether a member is nullable or not.
+    /// This expects nullable reference types to be enabled,
+    /// which means that nullable references which are not properly annotated will return false.
+    /// </summary>
+    /// <param name="memberInfo">The member to check.</param>
+    /// <returns>True if the member is nullable, false if not.</returns>
+    /// <exception cref="NullReferenceException">
+    /// Thrown if any expected reflective value is null.
+    /// If this gets raised, please escalate the exception to https://github.com/X39/cs-x39-util/issues
+    /// </exception>
+    /// <exception cref="InvalidCastException">
+    /// Thrown when any expected reflective value is not of the expected type.
+    /// If this gets raised, please escalate the exception to https://github.com/X39/cs-x39-util/issues
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the <see cref="MemberInfo"/> contains data that cannot be properly extracted.
+    /// If this gets raised, please escalate the exception to https://github.com/X39/cs-x39-util/issues
+    /// </exception>
     public static bool IsNullable(this MemberInfo memberInfo)
     {
         byte GetNullableReferenceContextFlag(object? nullableContextAttribute)
