@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -100,5 +102,19 @@ public static class TestHelpers
         }
 
         return ex;
+    }
+
+    public static MemberInfo GetMemberInfo<T>(Expression<Func<T, object?>> func)
+    {
+        var type = typeof(T);
+        Expression expression = func.Body;
+        if (expression is UnaryExpression unaryExpression)
+            expression = unaryExpression.Operand;
+        if (expression is MethodCallExpression methodCallExpression)
+            return methodCallExpression.Method;
+        if (expression is MemberExpression memberExpression)
+            return memberExpression.Member; 
+
+        throw new InvalidOperationException("Failed to get member expression during test.");
     }
 }
