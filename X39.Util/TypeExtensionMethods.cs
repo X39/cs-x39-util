@@ -5,15 +5,19 @@ using X39.Util.Collections.Concurrent;
 
 #nullable enable
 namespace X39.Util;
+
 [PublicAPI]
 public static partial class TypeExtensionMethods
 {
     // ReSharper disable once IdentifierTypo
-    private static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new(); 
-    private static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new(); 
-    private static readonly RWLConcurrentDictionary<Type, string> NameCache = new(); 
+    private static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new();
+    private static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new();
+    private static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
     private static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
-    private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache = new();
+
+    private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache =
+        new();
+
     /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
     /// </summary>
@@ -84,13 +88,13 @@ public static partial class TypeExtensionMethods
             return baseType;
         if (type.IsArray)
         {
-            return BaseTypeCache[type] =type.GetElementType()
-                                        ?? throw new NullReferenceException();
+            return BaseTypeCache[type] = type.GetElementType()
+                                         ?? throw new NullReferenceException();
         }
 
         if (type.IsGenericType && typeof(IGrouping<,>).IsEquivalentTo(type.GetGenericTypeDefinition()))
         {
-            return BaseTypeCache[type] =type.GetGenericArguments().Skip(1).First();
+            return BaseTypeCache[type] = type.GetGenericArguments().Skip(1).First();
         }
 
         if (type.IsGenericType && type.GetInterfaces().Any(
@@ -98,7 +102,7 @@ public static partial class TypeExtensionMethods
                     ? typeof(IEnumerable<>).IsEquivalentTo(@interface.GetGenericTypeDefinition())
                     : typeof(System.Collections.IEnumerable).IsEquivalentTo(@interface)))
         {
-            return BaseTypeCache[type] =type.GetGenericArguments().First();
+            return BaseTypeCache[type] = type.GetGenericArguments().First();
         }
 
         // Has no element type, exit
@@ -139,12 +143,13 @@ public static partial class TypeExtensionMethods
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
             return @delegate.DynamicInvoke()!;
         CreateInstanceCache[key] = @delegate = Expression.Lambda(Expression.New(t)).Compile();
-        
+
         return @delegate.DynamicInvoke()!;
     }
 
     public static T CreateInstance<T>(this Type t, params object[] args)
         => (T) CreateInstance(t, args);
+
     public static object CreateInstance(this Type t, params object[] args)
     {
         var key = (t, args.Select((q) => q.GetType()).ToArray());
@@ -165,7 +170,7 @@ public static partial class TypeExtensionMethods
         // ReSharper disable once CoVariantArrayConversion
         var newExpression = Expression.New(constructor, parameterExpressions);
         var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
-        CreateInstanceCache[key] =  @delegate = lambdaExpression.Compile();
+        CreateInstanceCache[key] = @delegate = lambdaExpression.Compile();
         return @delegate.DynamicInvoke(args)!;
     }
 
@@ -174,4 +179,22 @@ public static partial class TypeExtensionMethods
     {
         RuntimeHelpers.RunClassConstructor(type.TypeHandle);
     }
+
+    /// <summary>
+    /// Checks if <paramref name="type"/> is equivalent to a generic type.
+    /// </summary>
+    /// <remarks>
+    /// Equivalent to checking if <paramref name="type"/> has <see cref="Type.IsGenericType"/>
+    /// set as <see langword="true"/> and that the generic <see cref="Type"/> received via
+    /// <see cref="Type.GetGenericTypeDefinition"/> is yielding true with <see cref="Type.IsEquivalentTo"/>, getting
+    /// <paramref name="otherType"/> passed.
+    /// </remarks>
+    /// <example>
+    /// <code>typeof(Nullable&lt;int&gt;).IsGenericType&lt;Nullable&lt;&gt;&gt;() // true</code>
+    /// </example>>
+    /// <param name="type">The type to check.</param>
+    /// <param name="otherType">The generic type to check against</param>
+    /// <returns><see langword="true"/> if <paramref name="type"/> is equivalent to <paramref name="otherType"/>.</returns>
+    public static bool IsGenericType(this Type type, Type otherType)
+        => type.IsGenericType && type.GetGenericTypeDefinition().IsEquivalentTo(otherType);
 }
