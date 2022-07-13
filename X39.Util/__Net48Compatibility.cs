@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+﻿#if NET48
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable RedundantNameQualifier
@@ -23,7 +23,8 @@ public sealed class MaybeNullWhenAttribute : Attribute
     /// <summary>Gets the return value condition.</summary>
     public bool ReturnValue { get; }
 }
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited = false)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited
+ = false)]
 public sealed class MaybeNullAttribute : Attribute
 {
 }
@@ -47,6 +48,16 @@ namespace System.Runtime.CompilerServices
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static class IsExternalInit
     {
+    }
+}
+namespace System.Net.Http
+{
+    internal class NamespaceKeeper
+    {
+        private NamespaceKeeper()
+        {
+            
+        }
     }
 }
 #endif

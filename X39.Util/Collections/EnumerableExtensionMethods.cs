@@ -84,6 +84,8 @@ public static class EnumerableExtensionMethods
         return !source.Any(predicate);
     }
     
+    #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+    
     /// <summary>
     /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
     /// an index of the element.
@@ -116,4 +118,5 @@ public static class EnumerableExtensionMethods
     {
         return source.Select((value, index) => (value, index + offset));
     }
+#endif
 }

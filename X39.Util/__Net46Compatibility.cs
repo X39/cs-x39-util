@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+﻿#if NET46
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable RedundantNameQualifier
@@ -47,6 +47,16 @@ namespace System.Runtime.CompilerServices
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static class IsExternalInit
     {
+    }
+}
+namespace System.Net.Http
+{
+    internal class NamespaceKeeper
+    {
+        private NamespaceKeeper()
+        {
+            
+        }
     }
 }
 #endif

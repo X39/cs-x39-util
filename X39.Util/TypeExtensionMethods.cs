@@ -15,8 +15,13 @@ public static partial class TypeExtensionMethods
     private static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
     private static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
     private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache =
         new();
+#else
+    private static readonly RWLConcurrentDictionary<Tuple<Type, Type[]>, Delegate> CreateInstanceCache =
+        new();
+#endif
 
     /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
@@ -139,7 +144,11 @@ public static partial class TypeExtensionMethods
 
     public static object CreateInstance(this Type t)
     {
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
         var key = (t, Type.EmptyTypes);
+#else
+        var key = Tuple.Create(t, Type.EmptyTypes);
+#endif
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
             return @delegate.DynamicInvoke()!;
         CreateInstanceCache[key] = @delegate = Expression.Lambda(Expression.New(t)).Compile();
@@ -152,7 +161,11 @@ public static partial class TypeExtensionMethods
 
     public static object CreateInstance(this Type t, params object[] args)
     {
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
         var key = (t, args.Select((q) => q.GetType()).ToArray());
+#else
+        var key = Tuple.Create(t, args.Select((q) => q.GetType()).ToArray());
+#endif
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
             return @delegate.DynamicInvoke()!;
         var constructor = t.GetConstructor(
