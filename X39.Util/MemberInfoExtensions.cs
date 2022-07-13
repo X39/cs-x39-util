@@ -36,9 +36,11 @@ public static class MemberInfoExtensions
                 return 0;
             var flagField = nullableContextAttribute.GetType().GetField(FieldFlagOfNullableContext);
             if (flagField is null)
+#pragma warning disable CA2201
                 throw new NullReferenceException(
                     $"Failed to get {FieldFlagOfNullableContext} field of {FullNameOfNullableContextAttribute}. " +
                     $"Please raise an issue at https://github.com/X39/cs-x39-util/issues");
+#pragma warning restore CA2201
             var flagValue = flagField.GetValue(nullableContextAttribute);
             if (flagValue is byte b)
                 return b;
@@ -53,9 +55,11 @@ public static class MemberInfoExtensions
                 return Array.Empty<byte>();
             var flagField = nullableAttribute.GetType().GetField(FieldNullableFlagsOfNullable);
             if (flagField is null)
+#pragma warning disable CA2201
                 throw new NullReferenceException(
                     $"Failed to get {FieldNullableFlagsOfNullable} field of {FullNameOfNullableAttribute}. " +
                     $"Please raise an issue at https://github.com/X39/cs-x39-util/issues");
+#pragma warning restore CA2201
             var flagValue = flagField.GetValue(nullableAttribute);
             if (flagValue is byte[] b)
                 return b;
@@ -85,9 +89,11 @@ public static class MemberInfoExtensions
         if (GetNullableReferenceContextFlag(memberInfoNullableContextAttribute) is 2)
             return true;
         var declaringType = memberInfo.DeclaringType
+#pragma warning disable CA2201
                             ?? throw new NullReferenceException(
                                 $"Declaring type is null. " +
                                 "Please raise an issue at https://github.com/X39/cs-x39-util/issues");
+#pragma warning restore CA2201
         var declaringTypeNullableContextAttribute = declaringType.GetCustomAttributes().FirstOrDefault(
             (attribute) => attribute.GetType().FullName == FullNameOfNullableContextAttribute);
         // ReSharper disable once ConvertIfStatementToReturnStatement

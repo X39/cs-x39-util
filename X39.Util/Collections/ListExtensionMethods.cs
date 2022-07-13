@@ -1,5 +1,8 @@
 ﻿namespace X39.Util.Collections;
 
+/// <summary>
+/// Contains methods extending classes implementing the <see cref="IList{T}"/> interface.
+/// </summary>
 public static class ListExtensionMethods
 {
     /// <summary>
