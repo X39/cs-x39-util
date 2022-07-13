@@ -23,8 +23,6 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Pack
       # CHANGE PACKAGE VERSION - The retarded way
       # Change the /p:VERSION=X.X.X part to change the actual package version.

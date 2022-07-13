@@ -14,9 +14,24 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/X39/cs-x39-util</RepositoryUrl>
         <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSources>true</IncludeSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsTrimable>true</IsTrimable>
         <NeutralLanguage>en-US</NeutralLanguage>
         <DefaultLanguage>en-US</DefaultLanguage>
+        <PackageTags>utility;common</PackageTags>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
