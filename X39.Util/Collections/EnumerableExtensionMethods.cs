@@ -1,25 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace X39.Util.Collections;
 
+/// <summary>
+/// Contains methods that extend the functionality of classes implementing the <see cref="IEnumerable{T}"/> interface.
+/// </summary>
 [PublicAPI]
 public static class EnumerableExtensionMethods
 {
     /// <summary>
-    ///     Drops the nullable state and throws if any of the items given is null.
+    ///     Drops the nullable state and throws a <see cref="NullReferenceException"/>
+    ///     if any of the items given is null.
     /// </summary>
     /// <param name="source">The <see cref="Enumerable"/> without nullable reference types.</param>
     /// <returns>
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
-    public static IEnumerable<T> DropNull<T>(this IEnumerable<T?> source)
+    public static IEnumerable<T> DropNull<T>([NoEnumeration] this IEnumerable<T?> source)
         where T : class
     {
         if (source is null)
             throw new ArgumentNullException(nameof(source), nameof(source) + " is null.");
 
-        return source.Select((q) => q ?? throw new NullReferenceException());
+#pragma warning disable CA2201
+        return source.Select((q) => q ?? throw new NullReferenceException(
+            "A null element is present in the enumerable."));
+#pragma warning restore CA2201
     }
 
     /// <summary>
@@ -30,7 +36,7 @@ public static class EnumerableExtensionMethods
     /// <returns>
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> source)
+    public static IEnumerable<T> NotNull<T>([NoEnumeration] this IEnumerable<T?> source)
         where T : class
     {
         if (source is null)
@@ -48,7 +54,7 @@ public static class EnumerableExtensionMethods
     ///     A now non nullable <see cref="IEnumerable{T}"/>.
     /// </returns>
     // ReSharper disable once ConvertNullableToShortForm
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<Nullable<T>> source)
+    public static IEnumerable<T> NotNull<T>([NoEnumeration] this IEnumerable<Nullable<T>> source)
         where T : struct
     {
         if (source is null)
@@ -56,17 +62,16 @@ public static class EnumerableExtensionMethods
 
         return source.Where((t) => t.HasValue).Select((t) => t!.Value);
     }
-    
-    
+
 
     /// <summary>Determines whether all elements of a sequence do not satisfy a condition.</summary>
     /// <param name="source">An <see cref="IEnumerable{TSource}" /> that contains the elements to apply the predicate to.</param>
     /// <param name="predicate">A function to test each element for a condition.</param>
     /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
-    /// <exception cref="T:System.ArgumentNullException">
+    /// <exception cref="System.ArgumentNullException">
     /// <paramref name="source" /> is <see langword="null" />.
     /// </exception>
-    /// <exception cref="T:System.ArgumentNullException">
+    /// <exception cref="System.ArgumentNullException">
     /// <paramref name="predicate" /> is <see langword="null" />.
     /// </exception>
     /// <returns>
@@ -83,9 +88,32 @@ public static class EnumerableExtensionMethods
 
         return !source.Any(predicate);
     }
-    
-    #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    
+
+    /// <summary>Determines whether a sequence is empty.</summary>
+    /// <remarks>
+    /// This is named the way it is to match the
+    /// <see cref="None{T}(System.Collections.Generic.IEnumerable{T},System.Func{T,bool})"/> method.
+    /// </remarks>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> that contains the elements to apply the predicate to.</param>
+    /// <typeparam name="T">The type of the elements of <paramref name="source" />.</typeparam>
+    /// <exception cref="System.ArgumentNullException">
+    /// <paramref name="source" /> is <see langword="null" />.
+    /// </exception>
+    /// <returns>
+    /// <see langword="false" /> if any element of the source sequence passes the test in the specified predicate;
+    /// otherwise, <see langword="true" />.
+    /// </returns>
+    // ReSharper disable once ConvertNullableToShortForm
+    public static bool None<T>(this IEnumerable<T> source)
+    {
+        if (source is null)
+            throw new ArgumentNullException(nameof(source), nameof(source) + " is null.");
+
+        return !source.Any();
+    }
+
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+
     /// <summary>
     /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
     /// an index of the element.
@@ -97,7 +125,7 @@ public static class EnumerableExtensionMethods
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IEnumerable<(T value, int index)> Indexed<T>(this IEnumerable<T> source)
+    public static IEnumerable<(T value, int index)> Indexed<T>([NoEnumeration] this IEnumerable<T> source)
     {
         return source.Select((value, index) => (value, index));
     }
@@ -114,7 +142,7 @@ public static class EnumerableExtensionMethods
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IEnumerable<(T value, int index)> Indexed<T>(this IEnumerable<T> source, int offset)
+    public static IEnumerable<(T value, int index)> Indexed<T>([NoEnumeration] this IEnumerable<T> source, int offset)
     {
         return source.Select((value, index) => (value, index + offset));
     }
