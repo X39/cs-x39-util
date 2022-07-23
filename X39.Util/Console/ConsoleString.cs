@@ -94,7 +94,11 @@ public struct ConsoleString
     {
         if (Text.Contains('\n'))
             throw new InvalidOperationException("Cannot clear console strings containing line terminator.");
-        System.Console.Write(string.Concat('\r', new string(' ', Text.Length), '\r'));
+        var bString = new string('\b', Text.Length);
+        var wString = new string(' ', Text.Length);
+        System.Console.Write(bString);
+        System.Console.Write(wString);
+        System.Console.Write(bString);
     }
 
     /// <summary>
