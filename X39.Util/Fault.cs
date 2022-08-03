@@ -106,23 +106,27 @@ public static class Fault
         }
     }
 
+    /// <inheritdoc cref="IgnoreAsync(System.Func{System.Threading.Tasks.Task})"/>
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task Ignore(
         [InstantHandle] Func<Task> action)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <inheritdoc cref="IgnoreAsync{T}(System.Func{System.Threading.Tasks.Task{T}},System.Func{T})"/>
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
         [InstantHandle] T defaultValueFactory)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <inheritdoc cref="IgnoreAsync{T}(System.Func{System.Threading.Tasks.Task{T}},System.Func{T})"/>
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
         [InstantHandle] Func<T> defaultValueFactory)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <inheritdoc cref="IgnoreAsync{T}(System.Func{System.Threading.Tasks.Task{T}},System.Func{System.Threading.Tasks.Task{T}})"/>
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
