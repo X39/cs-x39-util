@@ -111,9 +111,44 @@ public static class EnumerableExtensionMethods
 
         return !source.Any();
     }
+    
+    #if NET46 || NET461 || NET462
+    
+    /// <summary>
+    /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
+    /// an index of the element.
+    /// </summary>
+    /// <remarks>
+    /// Equivalent to calling <code>source.Select((value, index) => (value, index))</code>
+    /// </remarks>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> to add an index to.</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<Tuple<T, int>> Indexed<T>([NoEnumeration] this IEnumerable<T> source)
+    {
+        return source.Select((value, index) => Tuple.Create(value, index));
+    }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-
+    /// <summary>
+    /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
+    /// an index of the element + <paramref name="offset"/>.
+    /// </summary>
+    /// <remarks>
+    /// Equivalent to calling <code>source.Select((value, index) => (value, index + offset))</code>
+    /// </remarks>
+    /// <param name="source">An <see cref="IEnumerable{TSource}" /> to add an index to.</param>
+    /// <param name="offset">The offset for the index to be inserted.</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<Tuple<T, int>> Indexed<T>([NoEnumeration] this IEnumerable<T> source, int offset)
+    {
+        return source.Select((value, index) => Tuple.Create(value, index + offset));
+    }
+    
+    #else
+    
     /// <summary>
     /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
     /// an index of the element.
@@ -132,7 +167,7 @@ public static class EnumerableExtensionMethods
 
     /// <summary>
     /// Makes a <see cref="IEnumerable{T}"/> return its <typeparamref name="T"/> along with
-    /// an index of the element.
+    /// an index of the element + <paramref name="offset"/>.
     /// </summary>
     /// <remarks>
     /// Equivalent to calling <code>source.Select((value, index) => (value, index + offset))</code>
