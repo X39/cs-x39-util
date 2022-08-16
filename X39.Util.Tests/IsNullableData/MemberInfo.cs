@@ -7,7 +7,7 @@
 #pragma warning disable CS8632
 #pragma warning disable CS8618
 #pragma warning disable CA1822
-namespace X39.Util.Tests.MemberInfoExtensions;
+namespace X39.Util.Tests.IsNullableData.MemberInfo;
 
 #nullable enable
 public class NullableEnabledMixed

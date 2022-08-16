@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
@@ -110,11 +111,20 @@ public static class TestHelpers
         Expression expression = func.Body;
         if (expression is UnaryExpression unaryExpression)
             expression = unaryExpression.Operand;
+        
         if (expression is MethodCallExpression methodCallExpression)
             return methodCallExpression.Method;
         if (expression is MemberExpression memberExpression)
             return memberExpression.Member; 
 
         throw new InvalidOperationException("Failed to get member expression during test.");
+    }
+    public static ParameterInfo GetParameterInfo<T>(Expression<Func<T, object?>> func, int index)
+    {
+        var memberInfo = GetMemberInfo(func) as MethodInfo
+                         ?? throw new InvalidOperationException(
+                             "Failed to get parameter info during test due to no method being searched.");
+        return memberInfo.GetParameters().ElementAtOrDefault(index)
+         ??throw new InvalidOperationException("Failed to get parameter during test.");
     }
 }
