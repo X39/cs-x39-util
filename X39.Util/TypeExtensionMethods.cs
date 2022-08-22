@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -260,6 +261,43 @@ public static partial class TypeExtensionMethods
         var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
         CreateInstanceCache[key] = @delegate = lambdaExpression.Compile();
         return @delegate.DynamicInvoke(args)!;
+    }
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
+    /// The method will use the given <paramref name="types"/> to determine which constructor to use.
+    /// It will find any constructor, private or public.
+    /// </summary>
+    /// <remarks>
+    /// It is expected that the count of <paramref name="args"/> is equal to the count of <paramref name="types"/>.
+    /// This is asserted using <see cref="Debug.Assert(bool)"/>
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <param name="types">The <see cref="Type"/>'s of the arguments passed in</param>
+    /// <param name="args">The arguments to pass into the constructor.</param>
+    /// <returns>The newly created instance.</returns>
+    /// <exception cref="NullReferenceException"></exception>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public static object CreateInstanceWithUncached(this Type t, Type[] types, object?[] args)
+    {
+        Debug.Assert(
+            types.Length == args.Length,
+            $"The count of args ({args.Length}) is not equal to the count of types ({types.Length})");
+        var constructor = t.GetConstructor(
+                              bindingAttr: System.Reflection.BindingFlags.Public |
+                                           System.Reflection.BindingFlags.Instance |
+                                           System.Reflection.BindingFlags.NonPublic,
+                              binder: Type.DefaultBinder,
+                              types: types,
+                              modifiers: Array.Empty<System.Reflection.ParameterModifier>())
+                          ?? throw new NullReferenceException("Constructor method is null.");
+
+        var parameterExpressions = args
+            .Select((_, i) => Expression.Parameter(types[i], $"arg{i}"))
+            .ToArray();
+        // ReSharper disable once CoVariantArrayConversion
+        var newExpression = Expression.New(constructor, parameterExpressions);
+        var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
+        return @lambdaExpression.Compile().DynamicInvoke(args)!;
     }
 
     /// <inheritdoc cref="RuntimeHelpers.RunClassConstructor"/>
