@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace X39.Util;
 
@@ -106,29 +107,60 @@ public static class Fault
         }
     }
 
+    /// <summary>
+    /// Guard method to prevent accidental (and intentional) use of async in sync context.
+    /// </summary>
+    /// <remarks>
+    /// This mostly is for IDE support and will always throw an exception and be marked as "obsolete".
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Always thrown when used.</exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task Ignore(
         [InstantHandle] Func<Task> action)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <summary>
+    /// Guard method to prevent accidental (and intentional) use of async in sync context.
+    /// </summary>
+    /// <remarks>
+    /// This mostly is for IDE support and will always throw an exception and be marked as "obsolete".
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Always thrown when used.</exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
         [InstantHandle] T defaultValueFactory)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <summary>
+    /// Guard method to prevent accidental (and intentional) use of async in sync context.
+    /// </summary>
+    /// <remarks>
+    /// This mostly is for IDE support and will always throw an exception and be marked as "obsolete".
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Always thrown when used.</exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
         [InstantHandle] Func<T> defaultValueFactory)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
 
+    /// <summary>
+    /// Guard method to prevent accidental (and intentional) use of async in sync context.
+    /// </summary>
+    /// <remarks>
+    /// This mostly is for IDE support and will always throw an exception and be marked as "obsolete".
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Always thrown when used.</exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("Use IgnoreAsync instead.", true)]
     public static Task<T> Ignore<T>(
         [InstantHandle] Func<Task<T>> action,
         [InstantHandle] Func<Task<T>> defaultValueFactory)
         => throw new InvalidOperationException("Use IgnoreAsync instead.");
-
 
     /// <summary>
     /// Calls <paramref name="action"/> and ignores any potential <see cref="Exception"/> that may be raised.
