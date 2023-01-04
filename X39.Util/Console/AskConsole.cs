@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 
 namespace X39.Util.Console;
 
@@ -77,7 +78,6 @@ public static partial class AskConsole
     /// after the input string not being empty and the input string being validly convertible,
     /// confirmed using <see cref="TypeConverter.IsValid(object?)"/>.
     /// </returns>
-    /// <exception cref="NotSupportedException">Thrown when no <see cref="TypeConverter"/> is found.</exception>
     public static T ForValueFromCollection<T>(
         IEnumerable<T> source,
         Func<T, ConsoleString>? tToString = default,
@@ -88,11 +88,15 @@ public static partial class AskConsole
         if (sourceArray.Length is 0)
             throw new ArgumentException("Empty collection passed.", nameof(source));
         tToString ??= (t) => t?.ToString() ?? string.Empty;
+#pragma warning disable CA1305
         var maxIndexCharacters = sourceArray.Length.ToString().Length;
+#pragma warning restore CA1305
         for (var i = 0; i < sourceArray.Length; i++)
         {
             var display = tToString(sourceArray[i]);
+#pragma warning disable CA1305
             display.Prepend(string.Format($"{{0,{maxIndexCharacters}}}: ", i)).WriteLine();
+#pragma warning restore CA1305
         }
 
         System.Console.Write('>');
@@ -108,5 +112,35 @@ public static partial class AskConsole
         } while (true);
 
         return sourceArray[index];
+    }
+
+    /// <summary>
+    /// Prompts the console user to choose a value from a list of enum values available in <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="cancellationToken">
+    ///     A <see cref="CancellationToken"/> that can be cancelled to abort the loop.
+    ///     Will <b>NOT</b> cancel the blocking operation of reading from the console!
+    /// </param>
+    /// <param name="tToString">
+    ///     Function to transform <typeparamref name="T"/> to string.
+    ///     Defaults to <see cref="Enum.GetName"/>.
+    /// </param>
+    /// <param name="invalidSelectionText">
+    ///     The text to display when the selection is out of range or not a number.
+    /// </param>
+    /// <typeparam name="T">The type of the enum.</typeparam>
+    /// <returns>
+    ///     The value returned by <see cref="TypeConverter"/> when given the input string
+    ///     after the input string not being empty and the input string being validly convertible,
+    ///     confirmed using <see cref="TypeConverter.IsValid(object?)"/>.
+    /// </returns>
+    public static T ForEnumValue<T>(
+        Func<T, ConsoleString>? tToString = default,
+        ConsoleString invalidSelectionText = default,
+        CancellationToken cancellationToken = default)
+        where T : Enum
+    {
+        var enumValues = Enum.GetValues(typeof(T));
+        return ForValueFromCollection(enumValues.Cast<T>(), tToString, invalidSelectionText, cancellationToken);
     }
 }
