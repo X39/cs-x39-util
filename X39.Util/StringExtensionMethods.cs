@@ -94,4 +94,75 @@ public static partial class StringExtensionMethods
     /// <returns>A new <see cref="Uri"/> instance.</returns>
     public static Uri ToUri(this string source, UriKind uriKind)
         => new(source, uriKind);
+
+
+#if NET7_0_OR_GREATER
+
+    /// <summary>
+    /// Converts this <see cref="string"/> to the given <typeparamref name="T"/> that must implement the
+    /// <see cref="IParsable{TSelf}"/> <see langword="interface"/>.
+    /// Will parse <typeparamref name="T"/> with <see cref="CultureInfo.CurrentCulture"/>.
+    /// </summary>
+    /// <param name="self">The source <see cref="string"/> to convert from.</param>
+    /// <typeparam name="T">The <see cref="Type"/> to return.</typeparam>
+    /// <returns>The value that was returned by <see cref="IParsable{TSelf}.Parse"/>.</returns>
+    public static T ToParsable<T>(this string self) where T : IParsable<T>
+    {
+        return T.Parse(self, CultureInfo.CurrentCulture);
+    }
+
+    /// <summary>
+    /// Converts this <see cref="string"/> to the given <typeparamref name="T"/> that must implement the
+    /// <see cref="IParsable{TSelf}"/> <see langword="interface"/>.
+    /// </summary>
+    /// <param name="self">The source <see cref="string"/> to convert from.</param>
+    /// <param name="formatProvider">
+    ///     An optional <see cref="IFormatProvider"/> to specify the format used.
+    ///     Defaults to <see cref="CultureInfo.CurrentCulture"/> if <see langword="null"/> is provided.
+    /// </param>
+    /// <typeparam name="T">The <see cref="Type"/> to return.</typeparam>
+    /// <returns>The value that was returned by <see cref="IParsable{TSelf}.Parse"/>.</returns>
+    public static T ToParsable<T>(this string self, IFormatProvider formatProvider) where T : IParsable<T>
+    {
+        return T.Parse(self, formatProvider);
+    }
+
+    /// <summary>
+    /// Converts this <see cref="string"/> to the given <typeparamref name="T"/> that must implement the
+    /// <see cref="ISpanParsable{TSelf}"/> <see langword="interface"/>.
+    /// Will parse <typeparamref name="T"/> with <see cref="CultureInfo.CurrentCulture"/>.
+    /// </summary>
+    /// <param name="self">The source <see cref="string"/> to convert from.</param>
+    /// <typeparam name="T">The <see cref="Type"/> to return.</typeparam>
+    /// <returns>
+    ///     The value that was returned by
+    ///     <see cref="ISpanParsable{TSelf}.Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
+    /// </returns>
+    public static T ToSpanParsable<T>(this string self)
+        where T : ISpanParsable<T>
+    {
+        return T.Parse(self.AsSpan(), CultureInfo.CurrentCulture);
+    }
+
+    /// <summary>
+    /// Converts this <see cref="string"/> to the given <typeparamref name="T"/> that must implement the
+    /// <see cref="ISpanParsable{TSelf}"/> <see langword="interface"/>.
+    /// </summary>
+    /// <param name="self">The source <see cref="string"/> to convert from.</param>
+    /// <param name="formatProvider">
+    ///     An optional <see cref="IFormatProvider"/> to specify the format used.
+    ///     Defaults to <see cref="CultureInfo.CurrentCulture"/> if <see langword="null"/> is provided.
+    /// </param>
+    /// <typeparam name="T">The <see cref="Type"/> to return.</typeparam>
+    /// <returns>
+    ///     The value that was returned by
+    ///     <see cref="ISpanParsable{TSelf}.Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
+    /// </returns>
+    public static T ToSpanParsable<T>(this string self, IFormatProvider? formatProvider)
+        where T : ISpanParsable<T>
+    {
+        return T.Parse(self.AsSpan(), formatProvider);
+    }
+
+#endif
 }
