@@ -27,6 +27,18 @@ public static partial class TypeExtensionMethods
 #endif
 
     /// <summary>
+    /// Clears all cached data for the methods provided by <see cref="TypeExtensionMethods"/>. 
+    /// </summary>
+    public static void ClearCache()
+    {
+        DeNulledTypeCache.Clear();
+        FullNameCache.Clear();
+        NameCache.Clear();
+        BaseTypeCache.Clear();
+        CreateInstanceCache.Clear();
+    }
+
+    /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
     /// </summary>
     /// <param name="t"></param>
