@@ -1,9 +1,10 @@
 ﻿using NUnit.Framework;
-using X39.Util.Tests.MemberInfoExtensions;
+using X39.Util.Tests.IsNullableData;
+using X39.Util.Tests.IsNullableData.MemberInfo;
 
 namespace X39.Util.Tests;
 
-public class IsNullableTests
+public class IsNullableMemberInfoTests
 {
     [Test]
     public void NullableEnabledClassWithMixedNullabilityMethodTest()

@@ -1,13 +1,19 @@
-﻿#nullable enable
+#nullable enable
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using X39.Util.Collections;
 using X39.Util.Collections.Concurrent;
 
 namespace X39.Util;
 
+/// <summary>
+/// Offers utility method when working with <see cref="Type"/>.
+/// </summary>
 [PublicAPI]
 public static partial class TypeExtensionMethods
 {
@@ -155,8 +161,26 @@ public static partial class TypeExtensionMethods
             : type;
     }
 
+    /// <summary>
+    /// Creates a new instanceof the <paramref name="t"/> using the parameterless constructor,
+    /// casts it to <typeparamref name="T"/> and returns it.
+    /// </summary>
+    /// <remarks>
+    /// Calls <see cref="CreateInstance(System.Type)"/> internally.
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <typeparam name="T">The <see cref="Type"/> to cast the newly created instance to.</typeparam>
+    /// <returns>The casted, newly created instance.</returns>
     public static T CreateInstance<T>(this Type t) => (T) CreateInstance(t);
 
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> using a parameterless constructor.
+    /// </summary>
+    /// <remarks>
+    /// This method is cached.
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <returns>The newly created instance</returns>
     public static object CreateInstance(this Type t)
     {
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
@@ -171,15 +195,67 @@ public static partial class TypeExtensionMethods
         return @delegate.DynamicInvoke()!;
     }
 
+    /// <inheritdoc cref="CreateInstanceWith{T}"/>
+    [Obsolete("Use CreateInstanceWith instead")]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CreateInstance<T>(this Type t, params object[] args)
-        => (T) CreateInstance(t, args);
+        => CreateInstanceWith<T>(t, args);
 
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
+    /// </summary>
+    /// <remarks>
+    /// Uses <see cref="CreateInstanceWith(System.Type,System.Type[],object[])"/> internally.
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <param name="args">The arguments to pass into the constructor.</param>
+    /// <returns>The newly created instance.</returns>
+    public static T CreateInstanceWith<T>(this Type t, params object[] args)
+        => (T) CreateInstanceWith(t, args.Select((q) => q.GetType()).ToArray(), args);
+
+    /// <inheritdoc cref="CreateInstanceWith(System.Type,object[])"/>
+    [Obsolete("Use CreateInstanceWith instead")]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object CreateInstance(this Type t, params object[] args)
+        => CreateInstanceWith(t, args);
+
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
+    /// </summary>
+    /// <remarks>
+    /// Uses <see cref="CreateInstanceWith(System.Type,System.Type[],object[])"/> internally.
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <param name="args">The arguments to pass into the constructor.</param>
+    /// <returns>The newly created instance.</returns>
+    public static object CreateInstanceWith(this Type t, params object[] args)
+        => CreateInstanceWith(t, args.Select((q) => q.GetType()).ToArray(), args);
+
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
+    /// The method will use the given <paramref name="types"/> to determine which constructor to use.
+    /// It will find any constructor, private or public.
+    /// </summary>
+    /// <remarks>
+    /// This method is cached using compiled linq expressions, using <paramref name="t"/>
+    /// and <paramref name="types"/> as key.
+    /// It is expected that the count of <paramref name="args"/> is equal to the count of <paramref name="types"/>.
+    /// This is asserted using <see cref="Debug.Assert(bool)"/>
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <param name="types">The <see cref="Type"/>'s of the arguments passed in</param>
+    /// <param name="args">The arguments to pass into the constructor.</param>
+    /// <returns>The newly created instance.</returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public static object CreateInstanceWith(this Type t, Type[] types, object?[] args)
     {
+        Debug.Assert(
+            types.Length == args.Length,
+            $"The count of args ({args.Length}) is not equal to the count of types ({types.Length})");
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (t, args.Select((q) => q.GetType()).ToArray());
+        var key = (t, types);
 #else
-        var key = Tuple.Create(t, args.Select((q) => q.GetType()).ToArray());
+        var key = Tuple.Create(t, types);
 #endif
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
             return @delegate.DynamicInvoke()!;
@@ -188,18 +264,55 @@ public static partial class TypeExtensionMethods
                                            System.Reflection.BindingFlags.Instance |
                                            System.Reflection.BindingFlags.NonPublic,
                               binder: Type.DefaultBinder,
-                              types: args.Select((it) => it.GetType()).ToArray(),
+                              types: types,
                               modifiers: Array.Empty<System.Reflection.ParameterModifier>())
                           ?? throw new NullReferenceException("Constructor method is null.");
 
         var parameterExpressions = args
-            .Select((obj, i) => Expression.Parameter(obj.GetType(), $"arg{i}"))
+            .Select((_, i) => Expression.Parameter(types[i], $"arg{i}"))
             .ToArray();
         // ReSharper disable once CoVariantArrayConversion
         var newExpression = Expression.New(constructor, parameterExpressions);
         var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
         CreateInstanceCache[key] = @delegate = lambdaExpression.Compile();
         return @delegate.DynamicInvoke(args)!;
+    }
+    /// <summary>
+    /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
+    /// The method will use the given <paramref name="types"/> to determine which constructor to use.
+    /// It will find any constructor, private or public.
+    /// </summary>
+    /// <remarks>
+    /// It is expected that the count of <paramref name="args"/> is equal to the count of <paramref name="types"/>.
+    /// This is asserted using <see cref="Debug.Assert(bool)"/>
+    /// </remarks>
+    /// <param name="t">The <see cref="Type"/> to create.</param>
+    /// <param name="types">The <see cref="Type"/>'s of the arguments passed in</param>
+    /// <param name="args">The arguments to pass into the constructor.</param>
+    /// <returns>The newly created instance.</returns>
+    /// <exception cref="NullReferenceException"></exception>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public static object CreateInstanceWithUncached(this Type t, Type[] types, object?[] args)
+    {
+        Debug.Assert(
+            types.Length == args.Length,
+            $"The count of args ({args.Length}) is not equal to the count of types ({types.Length})");
+        var constructor = t.GetConstructor(
+                              bindingAttr: System.Reflection.BindingFlags.Public |
+                                           System.Reflection.BindingFlags.Instance |
+                                           System.Reflection.BindingFlags.NonPublic,
+                              binder: Type.DefaultBinder,
+                              types: types,
+                              modifiers: Array.Empty<System.Reflection.ParameterModifier>())
+                          ?? throw new NullReferenceException("Constructor method is null.");
+
+        var parameterExpressions = args
+            .Select((_, i) => Expression.Parameter(types[i], $"arg{i}"))
+            .ToArray();
+        // ReSharper disable once CoVariantArrayConversion
+        var newExpression = Expression.New(constructor, parameterExpressions);
+        var lambdaExpression = Expression.Lambda(newExpression, parameterExpressions);
+        return @lambdaExpression.Compile().DynamicInvoke(args)!;
     }
 
     /// <inheritdoc cref="RuntimeHelpers.RunClassConstructor"/>
