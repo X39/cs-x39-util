@@ -117,4 +117,7 @@ public static class TestHelpers
 
         throw new InvalidOperationException("Failed to get member expression during test.");
     }
+
+    public static TMemberInfoType GetMemberInfo<T, TMemberInfoType>(Expression<Func<T, object?>> func)
+        where TMemberInfoType : MemberInfo => (TMemberInfoType) GetMemberInfo(func);
 }

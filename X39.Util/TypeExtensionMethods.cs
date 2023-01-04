@@ -1,9 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿#nullable enable
+using System.Linq.Expressions;
+using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using X39.Util.Collections.Concurrent;
 
-#nullable enable
 namespace X39.Util;
 
 [PublicAPI]
@@ -14,6 +16,7 @@ public static partial class TypeExtensionMethods
     private static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new();
     private static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
     private static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
+    private static readonly RWLConcurrentDictionary<Type, bool> IsObsoleteCache = new();
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
     private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache =
@@ -236,4 +239,30 @@ public static partial class TypeExtensionMethods
     /// <returns><see langword="true"/> if <paramref name="type"/> is assignable to <paramref name="otherType"/>.</returns>
     public static bool IsAssignableFromGenericType(this Type type, Type otherType)
         => type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(otherType);
+
+    /// <summary>
+    /// Checks if the given <paramref name="type"/> has the <see cref="ObsoleteAttribute"/> placed and hence is
+    /// considered obsolete.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> to check.</param>
+    /// <param name="useCache">
+    ///     If <see langword="true"/>, the reflection lookup will be performed once and successive calls are served
+    ///     from a cache.
+    ///     If <see langword="false"/>, the reflection lookup is performed every time.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the <paramref name="type"/> is obsolete, <see langword="false"/> if not.
+    /// </returns>
+    public static bool IsObsolete(this Type type, bool useCache = true)
+    {
+        if (useCache && IsObsoleteCache.TryGetValue(type, out var flag))
+            return flag;
+        var attribute = type.GetCustomAttribute<ObsoleteAttribute>();
+        var tmp = attribute is not null;
+        if (tmp is false && type.DeclaringType?.IsObsolete(useCache: useCache) is {} classObsolete)
+            tmp = classObsolete;
+        if (useCache)
+            IsObsoleteCache[type] = tmp;
+        return tmp;
+    }
 }
