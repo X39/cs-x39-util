@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace X39.Util;
@@ -6,7 +7,8 @@ namespace X39.Util;
 /// <summary>
 /// Contains utility classes for <see cref="System.String"/>
 /// </summary>
-public static class StringExtensionMethods
+[PublicAPI]
+public static partial class StringExtensionMethods
 {
     /// <inheritdoc cref="string.IsNullOrWhiteSpace"/>
     [Pure]
@@ -21,6 +23,36 @@ public static class StringExtensionMethods
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
         => string.IsNullOrEmpty(value);
+    
+    /// <summary>
+    /// Inverted function of <see cref="IsNullOrWhiteSpace"/>.
+    /// Indicates whether a specified string is not <see langword="null"/>, an empty string (""),
+    /// or consists only of white-space characters.
+    /// </summary>
+    /// <param name="value">The string to test.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the value parameter is <see langword="null"/> or an empty string (""),
+    ///     or if value consists exclusively of white-space characters.
+    /// </returns>
+    [Pure]
+    [ContractAnnotation("null=>false", true)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNotNullOrWhiteSpace([NotNullWhen(true)] this string? value)
+        => !string.IsNullOrWhiteSpace(value);
+
+    /// <summary>
+    /// Inverted function of <see cref="IsNullOrEmpty"/>.
+    /// Indicates whether a specified string is not <see langword="null"/> or an empty string ("").
+    /// </summary>
+    /// <param name="value">The string to test.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the value parameter is <see langword="null"/> or an empty string ("").
+    /// </returns>
+    [Pure]
+    [ContractAnnotation("null=>false", true)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNotNullOrEmpty([NotNullWhen(true)] this string? value)
+        => !string.IsNullOrEmpty(value);
 
     /// <inheritdoc cref="string.Format(string,object)"/>
     [Pure]
@@ -53,7 +85,7 @@ public static class StringExtensionMethods
     /// <inheritdoc cref="ToUri(string, UriKind)"/>
     public static Uri ToUri(this string source)
         => new(source);
-    
+
     /// <summary>
     /// Creates a new <see cref="Uri"/> from <paramref name="source"/>.
     /// </summary>
