@@ -1,0 +1,59 @@
+﻿<#@ template language="C#" #>
+<#
+    var tuples = new[]
+    {
+        (ReturnType: typeof(bool), MethodName: "ToBoolean", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(sbyte), MethodName: "ToSByte", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(short), MethodName: "ToInt16", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(int), MethodName: "ToInt32", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(long), MethodName: "ToInt64", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(byte), MethodName: "ToByte", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(ushort), MethodName: "ToUInt16", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(uint), MethodName: "ToUInt32", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(ulong), MethodName: "ToUInt64", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(float), MethodName: "ToSingle", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(double), MethodName: "ToDouble", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(decimal), MethodName: "ToDecimal", IsFormattable: true, AtLeastNet6: false),
+        (ReturnType: typeof(byte[]), MethodName: "FromBase64String", IsFormattable: false, AtLeastNet6: false),
+        (ReturnType: typeof(DateTime), MethodName: "ToDateTime", IsFormattable: true, AtLeastNet6: false),
+    };
+#>
+// ReSharper disable BuiltInTypeReferenceStyle
+// ReSharper disable RedundantNameQualifier
+
+using System.Runtime.CompilerServices;
+
+namespace X39.Util;
+
+/// <summary>
+/// Contains utility classes for <see cref="System.String"/>
+/// </summary>
+public static partial class StringExtensionMethods
+{
+<#
+    foreach (var (returnType, methodName, isFormattable, _) in tuples)
+    {
+        if (isFormattable)
+        {
+#>
+    /// <inheritdoc cref="Convert.<#= methodName #>(string, IFormatProvider)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Pure]
+    public static <#= returnType.FullName #> <#= methodName #>(this string value, IFormatProvider provider)
+    {
+        return Convert.<#= methodName #>(value, provider);
+    }
+<#
+        }
+#>
+    /// <inheritdoc cref="Convert.<#= methodName #>(string)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Pure]
+    public static <#= returnType.FullName #> <#= methodName #>(this string value)
+    {
+        return Convert.<#= methodName #>(value);
+    }   
+<#
+    }
+#>
+}
