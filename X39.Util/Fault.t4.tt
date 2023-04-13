@@ -1,0 +1,167 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#
+    const int maxTypeArgs = 20;
+#>
+// ReSharper disable BuiltInTypeReferenceStyle
+// ReSharper disable RedundantNameQualifier
+using System.ComponentModel;
+
+namespace X39.Util;
+
+public static partial class Fault
+{
+#region Synchrounous
+
+
+<#
+    for (var i = 1; i < maxTypeArgs; i++)
+    {
+        var typeParameterList = string.Concat("TResult, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"TException{j}")));
+        var argumentList = string.Concat("Func<TResult> func, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"Func<TException{j}, TResult> exceptionHandler{j}")));
+        var typeConstraintList = string.Join(" where ", Enumerable.Range(1, i).Select(j => $"TException{j} : Exception"));
+#>
+    /// <summary>
+    /// Executes the provided <paramref name="func"/> and:
+    /// <list type="bullet">
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+    /// <item>Handles any <typeparamref name="TException<#= j #>"/> that might occur with the provided <paramref name="exceptionHandler<#= j #>"/></item>
+<#
+        }
+#>
+    /// </list>
+    /// </summary>
+    /// <param name="func">The function to execute.</param>
+    /// <param name="exceptionHandler1">The exception handler for <typeparamref name="TException1"/>. If raised, the value returned by this handler will be returned by the method as a whole.</param>
+    /// <typeparam name="TResult">The return type of the provided <paramref name="func"/> and the exception handlers.</typeparam>
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+    /// <typeparam name="TException<#= j #>">The type of the exception that might be raised by the provided <paramref name="func"/> and that will be handled by the provided <paramref name="exceptionHandler<#= j #>"/>.</typeparam>
+<#
+        }
+#>
+    /// <returns>The value returned by the provided <paramref name="func"/> or the value returned by the provided exception handlers if the exception was handled by one.</returns>
+    public static TResult Handle<<#= typeParameterList #>>(<#= argumentList #>) where <#= typeConstraintList #>
+    {
+        try
+        {
+            return func();
+        }
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+        catch (TException<#= j #> ex)
+        {
+            return exceptionHandler<#= j #>(ex);
+        }
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+#endregion
+
+#region Asynchronous
+
+
+<#
+    for (var i = 1; i < maxTypeArgs; i++)
+    {
+        var taskArgumentList = string.Concat("Func<Task<TResult>> func, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"Func<TException{j}, Task<TResult>> exceptionHandler{j}")));
+        var valueTaskArgumentList = string.Concat("Func<ValueTask<TResult>> func, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"Func<TException{j}, ValueTask<TResult>> exceptionHandler{j}")));
+        
+        var typeParameterList = string.Concat("TResult, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"TException{j}")));
+        var typeConstraintList = string.Join(" where ", Enumerable.Range(1, i).Select(j => $"TException{j} : Exception"));
+#>
+    /// <summary>
+    /// Executes the provided <paramref name="func"/> and:
+    /// <list type="bullet">
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+    /// <item>Handles any <typeparamref name="TException<#= j #>"/> that might occur with the provided <paramref name="exceptionHandler<#= j #>"/></item>
+<#
+        }
+#>
+    /// </list>
+    /// </summary>
+    /// <param name="func">The function to execute.</param>
+    /// <param name="exceptionHandler1">The exception handler for <typeparamref name="TException1"/>. If raised, the value returned by this handler will be returned by the method as a whole.</param>
+    /// <typeparam name="TResult">The return type of the provided <paramref name="func"/> and the exception handlers.</typeparam>
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+    /// <typeparam name="TException<#= j #>">The type of the exception that might be raised by the provided <paramref name="func"/> and that will be handled by the provided <paramref name="exceptionHandler<#= j #>"/>.</typeparam>
+<#
+        }
+#>
+    /// <returns>The value returned by the provided <paramref name="func"/> or the value returned by the provided exception handlers if the exception was handled by one.</returns>
+#if NETSTANDARD2_1_OR_GREATER
+    public static async ValueTask<TResult> HandleAsync<<#= typeParameterList #>>(<#= valueTaskArgumentList #>) where <#= typeConstraintList #>
+#else
+    public static async Task<TResult> HandleAsync<<#= typeParameterList #>>(<#= taskArgumentList #>) where <#= typeConstraintList #>
+#endif
+    {
+        try
+        {
+            return await func()
+                .ConfigureAwait(false);
+        }
+<#
+        for (var j = 1; j <= i; j++)
+        {
+#>
+        catch (TException<#= j #> ex)
+        {
+            return await exceptionHandler<#= j #>(ex)
+                .ConfigureAwait(false);
+        }
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+#endregion
+
+#region Async Guards
+
+
+<#
+    for (var i = 1; i < maxTypeArgs; i++)
+    {
+        var typeParameterList = string.Concat("TResult, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"TException{j}")));
+        var argumentList = string.Concat("Func<Task<TResult>> func, ",
+            string.Join(", ", Enumerable.Range(1, i).Select(j => $"Func<TException{j}, Task<TResult>> exceptionHandler{j}")));
+        var typeConstraintList = string.Join(" where ", Enumerable.Range(1, i).Select(j => $"TException{j} : Exception"));
+#>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("Use HandleAsync instead.", true)]
+    public static Task<TResult> Handle<<#= typeParameterList #>>(<#= argumentList #>) where <#= typeConstraintList #>
+    {
+        throw new NotSupportedException("Use HandleAsync instead.");
+    }
+<#
+    }
+#>
+#endregion
+}

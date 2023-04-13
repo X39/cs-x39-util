@@ -7,7 +7,7 @@ namespace X39.Util;
 /// Utility class to collect common functionality regarding fault (try-catch-finally) handling
 /// </summary>
 [PublicAPI]
-public static class Fault
+public static partial class Fault
 {
     /// <summary>
     /// Enum to allow an exception handling methods return value
