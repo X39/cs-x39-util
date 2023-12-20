@@ -2,15 +2,49 @@
 <#@ output extension=".cs" #>
 <#@ Assembly Name="System.Core, Version=4.0.0.0, Culture=neutral" #>
 <#@ Assembly Name="Microsoft.CSharp, Version=4.0.0.0, Culture=neutral" #>
+<#@ import namespace="System.Linq" #>
 
 using System.Linq.Expressions;
 
 namespace X39.Util;
 public static partial class TypeExtensionMethods
 {
+    private static void ClearDynCache()
+    {
 <#
     for (var i = 1; i < 20; i++)
     {
+#>
+<#
+        if (i >= 7)
+        {
+#>
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+<#
+        }
+#>
+        CreateInstanceDelegate<#= i #>Cache.Clear();
+<#
+        if (i >= 7)
+        {
+#>
+#endif
+<#
+        }
+#>
+<#
+    }
+#>
+    }
+<#
+    for (var i = 1; i < 20; i++)
+    {
+        var argList = string.Join(", ", Enumerable.Range(0, i).Select((q) => string.Concat("TArg", q + 1)));
+        var valueList = string.Join(", ", Enumerable.Range(0, i).Select((q) => string.Concat("arg", q + 1)));
+        var paramList = string.Join(", ",
+            Enumerable.Range(0, i).Select((q) => string.Concat("TArg", q + 1, " arg", q + 1)));
+        var typeOfArgList = string.Join(", ",
+            Enumerable.Range(0, i).Select((q) => string.Concat("typeof(TArg", q + 1, ")")));
         if (i >= 7)
         {
 #>
@@ -19,78 +53,14 @@ public static partial class TypeExtensionMethods
         }
 #>
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            <#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"Type");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>), Delegate> CreateInstanceDelegate<#= i #>Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            <#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"Type");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>>, Delegate> CreateInstanceDelegate<#= i #>Cache = new(); 
-#endif
-    public static object CreateInstance<<#
-        for (var j = 1; j <= i; j++)
-        {
-            Write(j != i ? $"TArg{j}, " : $"TArg{j}");
-        }
-#>>(
-        this Type t<#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($",\r\n        TArg{j} arg{j}");
-        }
-#>)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate<#= i #>Cache = new(); 
+    public static object CreateInstance<<#= argList #>>(this Type t<#= i > 0 ? ", " : string.Empty #><#= paramList #>)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            <#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"typeof(TArg{j})");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>);
-#else
-        var key = Tuple.Create(
-            t,
-            <#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"typeof(TArg{j})");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>);
-#endif
+        var key = new InstanceCacheKey(t, new[]{<#= typeOfArgList #>});
         if (CreateInstanceDelegate<#= i #>Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(<#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"arg{j}");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>)
+            return del.DynamicInvoke(<#= valueList #>)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            <#
-        for (var j = 1; j <= i; j++)
-        {
-            Write($"typeof(TArg{j})");
-            Write(j != i ? ",\r\n            " : "\r\n            ");
-        }
-#>});
+        var constructor = t.GetConstructor(new[] {<#= typeOfArgList #>});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");

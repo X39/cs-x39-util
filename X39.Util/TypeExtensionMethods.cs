@@ -18,19 +18,122 @@ namespace X39.Util;
 public static partial class TypeExtensionMethods
 {
     // ReSharper disable once IdentifierTypo
-    private static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new();
-    private static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new();
-    private static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
-    private static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
-    private static readonly RWLConcurrentDictionary<Type, bool> IsObsoleteCache = new();
+    internal static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new();
+    internal static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new();
+    internal static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
+    internal static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
+    internal static readonly RWLConcurrentDictionary<Type, bool> IsObsoleteCache = new();
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly RWLConcurrentDictionary<(Type returnType, Type[] arguments), Delegate> CreateInstanceCache =
-        new();
+    internal struct InstanceCacheKey : IEquatable<InstanceCacheKey>
+    {
+        public bool Equals(InstanceCacheKey other)
+        {
+            return Type.IsEquivalentTo(other.Type)
+                   && Arguments.Length == other.Arguments.Length
+                   && Arguments.Zip(other.Arguments, (l, r) => l.IsEquivalentTo(r)).All((q) => q);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is InstanceCacheKey other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+#if NET5_0_OR_GREATER || NETSTANDARD2_1
+            switch (Arguments.Length)
+            {
+                case 0: return Type.GetHashCode();
+                case 1:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode());
+                case 2:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode());
+                case 3:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode(),
+                        Arguments[2].GetHashCode());
+                case 4:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode(),
+                        Arguments[2].GetHashCode(),
+                        Arguments[3].GetHashCode());
+                case 5:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode(),
+                        Arguments[2].GetHashCode(),
+                        Arguments[3].GetHashCode(),
+                        Arguments[4].GetHashCode());
+                case 6:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode(),
+                        Arguments[2].GetHashCode(),
+                        Arguments[3].GetHashCode(),
+                        Arguments[4].GetHashCode(),
+                        Arguments[5].GetHashCode());
+                case 7:
+                    return HashCode.Combine(
+                        Type.GetHashCode(),
+                        Arguments[0].GetHashCode(),
+                        Arguments[1].GetHashCode(),
+                        Arguments[2].GetHashCode(),
+                        Arguments[3].GetHashCode(),
+                        Arguments[4].GetHashCode(),
+                        Arguments[5].GetHashCode(),
+                        Arguments[6].GetHashCode());
+                default:
+                    var hashCode = new HashCode();
+                    hashCode.Add(Type.GetHashCode());
+                    foreach (var arg in Arguments)
+                    {
+                        hashCode.Add(arg.GetHashCode());
+                    }
+
+                    return hashCode.ToHashCode();
+            }
 #else
-    private static readonly RWLConcurrentDictionary<Tuple<Type, Type[]>, Delegate> CreateInstanceCache =
-        new();
+            unchecked
+            {
+                return Arguments.Select((q) => q.GetHashCode()).Aggregate(
+                    Type.GetHashCode(),
+                    (l, r) => (int)(r + 0x9e3779b9 + (l << 6) + (l >> 2)));
+            }
 #endif
+        }
+
+        public static bool operator ==(InstanceCacheKey left, InstanceCacheKey right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(InstanceCacheKey left, InstanceCacheKey right)
+        {
+            return !left.Equals(right);
+        }
+
+        public InstanceCacheKey(Type type, Type[] arguments)
+        {
+            Type = type;
+            Arguments = arguments;
+        }
+
+        public Type Type;
+        public Type[] Arguments;
+    }
+
+    internal static readonly RWLConcurrentDictionary<InstanceCacheKey, Delegate> CreateInstanceCache = new();
 
     /// <summary>
     /// Clears all cached data for the methods provided by <see cref="TypeExtensionMethods"/>. 
@@ -42,6 +145,7 @@ public static partial class TypeExtensionMethods
         NameCache.Clear();
         BaseTypeCache.Clear();
         CreateInstanceCache.Clear();
+        ClearDynCache();
     }
 
     /// <summary>
@@ -183,11 +287,7 @@ public static partial class TypeExtensionMethods
     /// <returns>The newly created instance</returns>
     public static object CreateInstance(this Type t)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (t, Type.EmptyTypes);
-#else
-        var key = Tuple.Create(t, Type.EmptyTypes);
-#endif
+        var key = new InstanceCacheKey(t, Type.EmptyTypes);
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
             return @delegate.DynamicInvoke()!;
         CreateInstanceCache[key] = @delegate = Expression.Lambda(Expression.New(t)).Compile();
@@ -252,13 +352,9 @@ public static partial class TypeExtensionMethods
         Debug.Assert(
             types.Length == args.Length,
             $"The count of args ({args.Length}) is not equal to the count of types ({types.Length})");
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (t, types);
-#else
-        var key = Tuple.Create(t, types);
-#endif
+        var key = new InstanceCacheKey(t, types);
         if (CreateInstanceCache.TryGetValue(key, out var @delegate))
-            return @delegate.DynamicInvoke()!;
+            return @delegate.DynamicInvoke(args)!;
         var constructor = t.GetConstructor(
                               bindingAttr: System.Reflection.BindingFlags.Public |
                                            System.Reflection.BindingFlags.Instance |
@@ -277,6 +373,7 @@ public static partial class TypeExtensionMethods
         CreateInstanceCache[key] = @delegate = lambdaExpression.Compile();
         return @delegate.DynamicInvoke(args)!;
     }
+
     /// <summary>
     /// Creates a new instance of the <paramref name="t"/> with the given <paramref name="args"/>.
     /// The method will use the given <paramref name="types"/> to determine which constructor to use.
@@ -384,7 +481,7 @@ public static partial class TypeExtensionMethods
             return flag;
         var attribute = type.GetCustomAttribute<ObsoleteAttribute>();
         var tmp = attribute is not null;
-        if (tmp is false && type.DeclaringType?.IsObsolete(useCache: useCache) is {} classObsolete)
+        if (tmp is false && type.DeclaringType?.IsObsolete(useCache: useCache) is { } classObsolete)
             tmp = classObsolete;
         if (useCache)
             IsObsoleteCache[type] = tmp;

@@ -4,40 +4,63 @@ using System.Linq.Expressions;
 namespace X39.Util;
 public static partial class TypeExtensionMethods
 {
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate1Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate1Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1>(
-        this Type t,
-        TArg1 arg1)
+    private static void ClearDynCache()
     {
+        CreateInstanceDelegate1Cache.Clear();
+        CreateInstanceDelegate2Cache.Clear();
+        CreateInstanceDelegate3Cache.Clear();
+        CreateInstanceDelegate4Cache.Clear();
+        CreateInstanceDelegate5Cache.Clear();
+        CreateInstanceDelegate6Cache.Clear();
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1)
-            );
+        CreateInstanceDelegate7Cache.Clear();
 #endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate8Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate9Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate10Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate11Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate12Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate13Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate14Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate15Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate16Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate17Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate18Cache.Clear();
+#endif
+#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
+        CreateInstanceDelegate19Cache.Clear();
+#endif
+    }
+
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate1Cache = new(); 
+    public static object CreateInstance<TArg1>(this Type t, TArg1 arg1)
+    {
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1)});
         if (CreateInstanceDelegate1Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1
-            )
+            return del.DynamicInvoke(arg1)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -56,46 +79,14 @@ public static partial class TypeExtensionMethods
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate2Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate2Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate2Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2>(this Type t, TArg1 arg1, TArg2 arg2)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2)});
         if (CreateInstanceDelegate2Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2
-            )
+            return del.DynamicInvoke(arg1, arg2)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -117,53 +108,14 @@ public static partial class TypeExtensionMethods
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate3Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate3Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate3Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3)});
         if (CreateInstanceDelegate3Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -188,60 +140,14 @@ public static partial class TypeExtensionMethods
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate4Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate4Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate4Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4)});
         if (CreateInstanceDelegate4Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -269,67 +175,14 @@ public static partial class TypeExtensionMethods
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate5Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate5Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate5Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5)});
         if (CreateInstanceDelegate5Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -360,74 +213,14 @@ public static partial class TypeExtensionMethods
                ?? throw new NullReferenceException("Constructor yielded null result.");
     }
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate6Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate6Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate6Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6)});
         if (CreateInstanceDelegate6Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -462,81 +255,14 @@ public static partial class TypeExtensionMethods
     }
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate7Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate7Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate7Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7)});
         if (CreateInstanceDelegate7Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -575,88 +301,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate8Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate8Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate8Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8)});
         if (CreateInstanceDelegate8Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -698,95 +350,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate9Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate9Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate9Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9)});
         if (CreateInstanceDelegate9Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -831,102 +402,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate10Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate10Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate10Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10)});
         if (CreateInstanceDelegate10Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -974,109 +457,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate11Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate11Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate11Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11)});
         if (CreateInstanceDelegate11Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -1127,116 +515,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate12Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate12Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate12Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12)});
         if (CreateInstanceDelegate12Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -1290,123 +576,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate13Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate13Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate13Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13)});
         if (CreateInstanceDelegate13Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -1463,130 +640,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate14Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate14Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate14Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14)});
         if (CreateInstanceDelegate14Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -1646,137 +707,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate15Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate15Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14,
-        TArg15 arg15)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate15Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14, TArg15 arg15)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15)});
         if (CreateInstanceDelegate15Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14,
-            arg15
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -1839,144 +777,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate16Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate16Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14,
-        TArg15 arg15,
-        TArg16 arg16)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate16Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14, TArg15 arg15, TArg16 arg16)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16)});
         if (CreateInstanceDelegate16Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14,
-            arg15,
-            arg16
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -2042,151 +850,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate17Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate17Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14,
-        TArg15 arg15,
-        TArg16 arg16,
-        TArg17 arg17)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate17Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14, TArg15 arg15, TArg16 arg16, TArg17 arg17)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17)});
         if (CreateInstanceDelegate17Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14,
-            arg15,
-            arg16,
-            arg17
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -2255,158 +926,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate18Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate18Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17, TArg18>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14,
-        TArg15 arg15,
-        TArg16 arg16,
-        TArg17 arg17,
-        TArg18 arg18)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate18Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17, TArg18>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14, TArg15 arg15, TArg16 arg16, TArg17 arg17, TArg18 arg18)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17), typeof(TArg18)});
         if (CreateInstanceDelegate18Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14,
-            arg15,
-            arg16,
-            arg17,
-            arg18
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17), typeof(TArg18)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
@@ -2478,165 +1005,14 @@ public static partial class TypeExtensionMethods
 #endif
 #if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
 
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-    private static readonly Dictionary<(
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            ), Delegate> CreateInstanceDelegate19Cache = new(); 
-#else
-    private static readonly Dictionary<Tuple<
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type,
-            Type
-            >, Delegate> CreateInstanceDelegate19Cache = new(); 
-#endif
-    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17, TArg18, TArg19>(
-        this Type t,
-        TArg1 arg1,
-        TArg2 arg2,
-        TArg3 arg3,
-        TArg4 arg4,
-        TArg5 arg5,
-        TArg6 arg6,
-        TArg7 arg7,
-        TArg8 arg8,
-        TArg9 arg9,
-        TArg10 arg10,
-        TArg11 arg11,
-        TArg12 arg12,
-        TArg13 arg13,
-        TArg14 arg14,
-        TArg15 arg15,
-        TArg16 arg16,
-        TArg17 arg17,
-        TArg18 arg18,
-        TArg19 arg19)
+    internal static readonly Dictionary<InstanceCacheKey, Delegate> CreateInstanceDelegate19Cache = new(); 
+    public static object CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TArg10, TArg11, TArg12, TArg13, TArg14, TArg15, TArg16, TArg17, TArg18, TArg19>(this Type t, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9, TArg10 arg10, TArg11 arg11, TArg12 arg12, TArg13 arg13, TArg14 arg14, TArg15 arg15, TArg16 arg16, TArg17 arg17, TArg18 arg18, TArg19 arg19)
     {
-#if NET5_0_OR_GREATER || NETSTANDARD2_0 || NETSTANDARD2_1 || NET47 || NET471 || NET472
-        var key = (
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18),
-            typeof(TArg19)
-            );
-#else
-        var key = Tuple.Create(
-            t,
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18),
-            typeof(TArg19)
-            );
-#endif
+        var key = new InstanceCacheKey(t, new[]{typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17), typeof(TArg18), typeof(TArg19)});
         if (CreateInstanceDelegate19Cache.TryGetValue(key, out var del))
-            return del.DynamicInvoke(arg1,
-            arg2,
-            arg3,
-            arg4,
-            arg5,
-            arg6,
-            arg7,
-            arg8,
-            arg9,
-            arg10,
-            arg11,
-            arg12,
-            arg13,
-            arg14,
-            arg15,
-            arg16,
-            arg17,
-            arg18,
-            arg19
-            )
+            return del.DynamicInvoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19)
                 ?? throw new NullReferenceException("Constructor yielded null result.");
-        var constructor = t.GetConstructor(new[] {
-            typeof(TArg1),
-            typeof(TArg2),
-            typeof(TArg3),
-            typeof(TArg4),
-            typeof(TArg5),
-            typeof(TArg6),
-            typeof(TArg7),
-            typeof(TArg8),
-            typeof(TArg9),
-            typeof(TArg10),
-            typeof(TArg11),
-            typeof(TArg12),
-            typeof(TArg13),
-            typeof(TArg14),
-            typeof(TArg15),
-            typeof(TArg16),
-            typeof(TArg17),
-            typeof(TArg18),
-            typeof(TArg19)
-            });
+        var constructor = t.GetConstructor(new[] {typeof(TArg1), typeof(TArg2), typeof(TArg3), typeof(TArg4), typeof(TArg5), typeof(TArg6), typeof(TArg7), typeof(TArg8), typeof(TArg9), typeof(TArg10), typeof(TArg11), typeof(TArg12), typeof(TArg13), typeof(TArg14), typeof(TArg15), typeof(TArg16), typeof(TArg17), typeof(TArg18), typeof(TArg19)});
         if (constructor == null)
         {
             var ex = new InvalidOperationException("No matching constructor existing.");
