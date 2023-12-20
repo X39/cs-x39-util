@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace X39.Util.Tests;
 
-public class CreateInstanceViaJsonSerializerTest
+public partial class CreateInstance
 {
     #region SerializerTest
 
@@ -144,7 +144,7 @@ public class CreateInstanceViaJsonSerializerTest
     #endregion
 
     [Test]
-    public void Test()
+    public void ViaJsonSerializerTest()
     {
         const string json = "{\"String\":\"AB\",\"UShort\":123}";
 
@@ -159,7 +159,7 @@ public class CreateInstanceViaJsonSerializerTest
             });
         }
 
-        Assert.AreEqual(4, TypeExtensionMethods.CreateInstanceCache.Count);
+        Assert.AreEqual(4, Util.TypeExtensionMethods.CreateInstanceCache.Count);
     }
 }
 

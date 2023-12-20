@@ -151,17 +151,31 @@ public static partial class TypeExtensionMethods
     /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
     /// </summary>
+    /// <remarks>
+    /// This method uses a cache to speed up successive calls.
+    /// </remarks>
     /// <param name="t"></param>
     /// <returns></returns>
     public static string FullName(this Type t)
     {
         if (FullNameCache.TryGetValue(t, out var fullName))
             return fullName;
+
+        fullName = FullNameUncached(t);
+        return FullNameCache[t] = fullName;
+    }
+
+    /// <summary>
+    /// Generates a valid C#-Code name from any type, including generics.
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    public static string FullNameUncached(this Type t)
+    {
         if (t.IsGenericParameter)
             return t.Name;
         if (!t.IsGenericType)
             return t.FullName?.Replace('+', '.') ?? "NULL";
-
         var builder = new StringBuilder();
         builder.Append(t.Namespace);
         builder.Append('.');
