@@ -117,4 +117,18 @@ public class FullNameTest
             "X39.Util.Tests.TypeExtensionMethods.Data.GenericClass<T1, T2, T3>.SubClassGeneric<T1, T2, T3>.SubSubClassGeneric<T1>",
             typeof(Data.GenericClass<,,>.SubClassGeneric<,,>.SubSubClassGeneric<>).FullNameUncached());
     }
+
+    [Test]
+    [NonParallelizable]
+    public void ValidateCacheWorks()
+    {
+        Util.TypeExtensionMethods.FullNameCache.Clear();
+        Assert.AreEqual(Util.TypeExtensionMethods.FullNameCache.Count, 0);
+        typeof(Data.GenericClass<,,>).FullNameUncached();
+        Assert.AreEqual(Util.TypeExtensionMethods.FullNameCache.Count, 0);
+        typeof(Data.GenericClass<,,>).FullName();
+        Assert.AreEqual(Util.TypeExtensionMethods.FullNameCache.Count, 1);
+        typeof(Data.GenericClass<,,>).FullName();
+        Assert.AreEqual(Util.TypeExtensionMethods.FullNameCache.Count, 1);
+    }
 }

@@ -19,11 +19,11 @@ namespace X39.Util;
 public static partial class TypeExtensionMethods
 {
     // ReSharper disable once IdentifierTypo
-    internal static readonly RWLConcurrentDictionary<Type, Type> DeNulledTypeCache = new();
-    internal static readonly RWLConcurrentDictionary<Type, string> FullNameCache = new();
-    internal static readonly RWLConcurrentDictionary<Type, string> NameCache = new();
-    internal static readonly RWLConcurrentDictionary<Type, Type> BaseTypeCache = new();
-    internal static readonly RWLConcurrentDictionary<Type, bool> IsObsoleteCache = new();
+    internal static readonly RWLConcurrentDictionary<TypeKey, Type> DeNulledTypeCache = new();
+    internal static readonly RWLConcurrentDictionary<TypeKey, string> FullNameCache = new();
+    internal static readonly RWLConcurrentDictionary<TypeKey, string> NameCache = new();
+    internal static readonly RWLConcurrentDictionary<TypeKey, Type> BaseTypeCache = new();
+    internal static readonly RWLConcurrentDictionary<TypeKey, bool> IsObsoleteCache = new();
 
     internal struct InstanceCacheKey : IEquatable<InstanceCacheKey>
     {
@@ -173,17 +173,6 @@ public static partial class TypeExtensionMethods
     /// <returns></returns>
     public static string FullNameUncached(this Type t)
     {
-        /*
-         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3
-         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3
-         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]
-         System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], X39.Util.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
-         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3[[System.Int32, System.Private.CoreLib, Version=7.0.…"
-         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=ne…"
-         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
-         "System.Collections.Generic.KeyValuePair`2[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
-         System.String
-         */
         if (t.FullName is null)
             return t.Name;
         if (t.IsGenericParameter)
@@ -218,6 +207,12 @@ public static partial class TypeExtensionMethods
             }
         }
 
+        if (t.IsArray)
+        {
+            builder.Append('[');
+            builder.Append(',', t.GetArrayRank());
+            builder.Append(']');
+        }
         return builder.ToString();
     }
 
@@ -251,7 +246,7 @@ public static partial class TypeExtensionMethods
             gravisIndex = t.Name.Length;
         builder.Append(t.Name.Substring(0, gravisIndex));
         builder.Append('<');
-        builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
+        builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullNameUncached)));
         builder.Append('>');
         return builder.ToString();
     }
