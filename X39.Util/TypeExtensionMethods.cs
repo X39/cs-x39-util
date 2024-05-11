@@ -1,6 +1,7 @@
 #nullable enable
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
@@ -108,7 +109,7 @@ public static partial class TypeExtensionMethods
             {
                 return Arguments.Select((q) => q.GetHashCode()).Aggregate(
                     Type.GetHashCode(),
-                    (l, r) => (int)(r + 0x9e3779b9 + (l << 6) + (l >> 2)));
+                    (l, r) => (int) (r + 0x9e3779b9 + (l << 6) + (l >> 2)));
             }
 #endif
         }
@@ -172,44 +173,87 @@ public static partial class TypeExtensionMethods
     /// <returns></returns>
     public static string FullNameUncached(this Type t)
     {
-        if (t.IsGenericParameter)
+        /*
+         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3
+         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3
+         X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]
+         System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3+SubClassGeneric`3[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], X39.Util.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[X39.Util.Tests.TypeExtensionMethods.Data.GenericClass`3[[System.Int32, System.Private.CoreLib, Version=7.0.…"
+         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=ne…"
+         "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+         "System.Collections.Generic.KeyValuePair`2[[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+         System.String
+         */
+        if (t.FullName is null)
             return t.Name;
-        if (!t.IsGenericType)
-            return t.FullName?.Replace('+', '.') ?? "NULL";
+        if (t.IsGenericParameter)
+            return t.FullName;
         var builder = new StringBuilder();
-        builder.Append(t.Namespace);
-        builder.Append('.');
-#if NET5_0_OR_GREATER
-        builder.Append(t.Name[..t.Name.IndexOf('`')].Replace('+', '.'));
-#else
-        builder.Append(t.Name.Substring(0, t.Name.IndexOf('`')).Replace('+', '-'));
-#endif
-        builder.Append('<');
-        builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
-        builder.Append('>');
-        return FullNameCache[t] = builder.ToString();
+        var fullName = t.FullName;
+        var argumentsIndex = fullName.IndexOf('[');
+        var typePart = argumentsIndex == -1 ? fullName : fullName.Substring(0, argumentsIndex);
+        var plusSplit = typePart.Split('+');
+        var genericArguments = t.GetGenericArguments();
+        var index = 0;
+        bool ran = false;
+        foreach (var str in plusSplit)
+        {
+            if (ran)
+                builder.Append('.');
+            ran = true;
+            var gravisIndex = str.IndexOf('`');
+            if (gravisIndex == -1)
+                builder.Append(str);
+            else
+            {
+                var left = str.Substring(0, gravisIndex);
+                builder.Append(left);
+
+                var right = str.Substring(gravisIndex + 1);
+                var num = int.Parse(right, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                builder.Append('<');
+                builder.Append(string.Join(", ", genericArguments.Skip(index).Take(num).Select(FullNameUncached)));
+                builder.Append('>');
+                index += num;
+            }
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>
     /// Generates a valid C#-Code name from any type, including generics.
     /// </summary>
-    /// <param name="t"></param>
-    /// <returns></returns>
+    /// <param name="t">The type for which to generate the name.</param>
+    /// <returns>The generated C# code name.</returns>
     public static string Name(this Type t)
     {
         if (NameCache.TryGetValue(t, out var name))
             return name;
-        if (!t.IsGenericType) return t.Name;
+
+        name = NameUncached(t);
+        return NameCache[t] = name;
+    }
+
+    /// <summary>
+    /// Returns the uncached name of the specified <paramref name="t"/> type.
+    /// If the type is a generic type, the generic arguments are included in the name.
+    /// </summary>
+    /// <param name="t">The <see cref="Type"/> to get the name of.</param>
+    /// <returns>The name of the specified type.</returns>
+    public static string NameUncached(this Type t)
+    {
+        if (!t.IsGenericType)
+            return t.Name;
         var builder = new StringBuilder();
-#if NET5_0_OR_GREATER
-        builder.Append(t.Name[..t.Name.IndexOf('`')]);
-#else
-        builder.Append(t.Name.Substring(0, t.Name.IndexOf('`')));
-#endif
+        var gravisIndex = t.Name.IndexOf('`');
+        if (gravisIndex == -1)
+            gravisIndex = t.Name.Length;
+        builder.Append(t.Name.Substring(0, gravisIndex));
         builder.Append('<');
         builder.Append(string.Join(", ", t.GetGenericArguments().Select(FullName)));
         builder.Append('>');
-        return NameCache[t] = builder.ToString();
+        return builder.ToString();
     }
 
     /// <summary>
