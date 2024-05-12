@@ -210,7 +210,7 @@ public static partial class TypeExtensionMethods
         if (t.IsArray)
         {
             builder.Append('[');
-            builder.Append(',', t.GetArrayRank());
+            builder.Append(',', t.GetArrayRank() - 1);
             builder.Append(']');
         }
         return builder.ToString();
