@@ -540,4 +540,23 @@ public static partial class TypeExtensionMethods
             IsObsoleteCache[type] = tmp;
         return tmp;
     }
+
+
+    /// <summary>
+    /// Returns a string, qualifying the provided <paramref name="type"/> against eg.
+    /// <see cref="Type.GetType(string)"/>. Unlike <see cref="Type.AssemblyQualifiedName"/>,
+    /// this method will provide the assembly qualified name without version or culture information.
+    /// </summary>
+    /// <param name="type">The type to get the assembly qualified name of.</param>
+    /// <returns>The AQN without version information.</returns>
+    public static string AssemblyQualifiedNameWithoutVersion(this Type type)
+    {
+        var custom = string.Join(
+                    ", ",
+                    type.FullName,
+                    type.Assembly.GetName()
+                        .Name
+                );
+        return custom;
+    }
 }
