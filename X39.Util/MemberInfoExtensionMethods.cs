@@ -160,6 +160,7 @@ public static partial class MemberInfoExtensionMethods
             PropertyInfo propertyInfo => propertyInfo.PropertyType,
             FieldInfo fieldInfo => fieldInfo.FieldType,
             MethodInfo methodInfo => methodInfo.ReturnType,
+            Type type => type,
             _ => throw new InvalidOperationException(
                 $"Unknown MemberInfo type {memberInfo.GetType().FullName()}. " +
                 "Please raise an issue at https://github.com/X39/cs-x39-util/issues")
