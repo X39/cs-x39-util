@@ -1,4 +1,4 @@
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER && !NET10_0_OR_GREATER
 using System.Runtime.CompilerServices;
 
 namespace X39.Util.Collections;

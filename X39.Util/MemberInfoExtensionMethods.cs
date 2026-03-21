@@ -148,6 +148,7 @@ public static partial class MemberInfoExtensionMethods
     /// <item><see cref="PropertyInfo"/>: The value of <see cref="PropertyInfo.PropertyType"/>.</item>
     /// <item><see cref="FieldInfo"/>: The value of <see cref="FieldInfo.FieldType"/>.</item>
     /// <item><see cref="MethodInfo"/>: The value of <see cref="MethodInfo.ReturnType"/>.</item>
+    /// <item><see cref="Type"/>: The value.</item>
     /// </list>
     /// </returns>
     /// <exception cref="InvalidOperationException">
